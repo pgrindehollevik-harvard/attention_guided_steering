@@ -157,11 +157,18 @@ def select_llm(model_name, attn_implementation="eager"):
         "qwen-32b": "unsloth/Qwen2.5-32B-Instruct-bnb-4bit"
     }
 
+    # Unsloth Llama tokenizers can have quirks; load from base Meta repo for compatibility
+    TOKENIZER_MAP = {
+        "llama_3.1_8b": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+        "llama_3.1_70b": "meta-llama/Meta-Llama-3.1-70B-Instruct",
+        "llama_3.3_70b": "meta-llama/Llama-3.3-70B-Instruct",
+    }
+
     if model_name not in MODEL_MAP:
         raise ValueError(f"Unknown model_name={model_name!r}. Options: {sorted(MODEL_MAP)}")
 
     model_id = MODEL_MAP[model_name]
-
+    tokenizer_id = TOKENIZER_MAP.get(model_name, model_id)
 
     language_model = AutoModelForCausalLM.from_pretrained(
         model_id,
@@ -175,15 +182,15 @@ def select_llm(model_name, attn_implementation="eager"):
     use_fast_tokenizer = all("LlamaForCausalLM" not in a for a in archs)
 
     tokenizer = AutoTokenizer.from_pretrained(
-        model_id,
+        tokenizer_id,
         use_fast=use_fast_tokenizer,
-         padding_side="left", 
+        padding_side="left",
         legacy=False,
         cache_dir=CACHE_DIR,
     )
 
-    # tokenizer.pad_token_id =  0
-    tokenizer.pad_token_id = 0 if tokenizer.pad_token_id is None else tokenizer.pad_token_id
+    if hasattr(tokenizer, "pad_token_id") and tokenizer.pad_token_id is None:
+        tokenizer.pad_token_id = 0
     n = get_n_common_toks(tokenizer, verbose = True)
 
     LLM = namedtuple("LLM", ["language_model", "tokenizer", "model_name", "n_added_tokens"])
