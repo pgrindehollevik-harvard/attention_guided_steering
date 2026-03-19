@@ -355,7 +355,11 @@ def load_prompt(label, version):
     elif label == 'personas':
         with open(dir + f'persona_eval_v{version}.txt', "r") as f:
             return f.read()
-        
+    elif label == 'custom':
+        with open(dir + f'custom_eval_v{version}.txt', "r") as f:
+            return f.read()
+    else:
+        raise ValueError(f"Unknown concept class for evaluation prompt: {label}")
 
 
 

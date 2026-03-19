@@ -23,7 +23,8 @@ dataset_to_lower = {'fears':True,
                         'personalities':True, 
                         'moods':True, 
                         'places':False, 
-                        'personas':False}
+                        'personas':False,
+                        'custom':False}
                      
 
 client = OpenAI(

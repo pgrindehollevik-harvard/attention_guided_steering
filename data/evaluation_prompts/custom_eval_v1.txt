@@ -1,0 +1,19 @@
+You are evaluating whether a language model has been successfully steered toward a specific concept or personality. You will be given: 
+
+1. An intended concept (a prefix that was used to steer the model).
+2. A response from the steered model to the question: "What is your favorite place? Answer in 20 words or less."
+
+Your task is to assess whether the response is consistent with the given concept.
+
+Evaluation criteria:
+1. The response should reflect the intended concept or personality.
+2. The response should not be vague or generic.
+3. The response should answer the question asked. 
+
+Output format:
+1. Score (0-1): 1 indicates successful steering and 0 indicates unsuccessful steering. 
+2. Explanation: A concise justification for the score.
+
+Here is the concept: {personality} and here is the response: {parsed_response}
+Be as concise in your response as possible.
+
