@@ -146,8 +146,8 @@ def get_n_common_toks(tokenizer, verbose = False):
 
 def select_llm(model_name, attn_implementation="eager"):
     MODEL_MAP = {
-        # Llama
-        "llama_3.1_8b":  "meta-llama/Meta-Llama-3.1-8B-Instruct",
+        # Llama (4-bit for 8B to fit on 24GB GPUs)
+        "llama_3.1_8b":  "unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit",
         "llama_3.1_70b": "unsloth/Meta-Llama-3.1-70B-Instruct-bnb-4bit",
         "llama_3.3_70b": "unsloth/Llama-3.3-70B-Instruct-bnb-4bit",
 
@@ -321,6 +321,7 @@ def parse_personality_responses(response, model_type):
     
     elif model_type == 'qwen-14b' or model_type == 'qwen-32b':
         passage = re.split(r"<\|im_start\|>assistant", response[1])[1]
+        passage = re.sub(r"<\|im_end\|>.*$", "", passage, flags=re.DOTALL)  # strip Qwen end token
     
     
     passage = "".join(passage)
