@@ -4,6 +4,7 @@ Python scripts `0_visualize_attn.py`–`4_visualize_scores.py` implement the ful
 
 ### 1) Environment
 - Python ≥3.10 and an NVIDIA GPU with CUDA (models load in 4-bit when available).
+- **Cluster / shared machines:** use a fresh project venv and verify `which python` — see **`docs/CLUSTER_SETUP.md`**.
 ```
 python -m venv .venv
 source .venv/bin/activate

@@ -23,7 +23,30 @@ import json
 from huggingface_hub import hf_hub_download
 
 
-CACHE_DIR = os.environ.get("CACHE_DIR")    #where the models will be downloaded
+def _resolve_hf_cache_dir() -> Optional[str]:
+    """
+    HF / from_pretrained cache directory. If CACHE_DIR is unset, invalid, or a doc placeholder,
+    return None so huggingface_hub uses its default (usually ~/.cache/huggingface).
+    """
+    raw = os.environ.get("CACHE_DIR")
+    if raw is None or not str(raw).strip():
+        return None
+    raw = str(raw).strip()
+    if raw == "/path/to/hf_cache" or raw.startswith("/path/to/"):
+        print(
+            "WARNING: CACHE_DIR looks like a README placeholder; ignoring. "
+            "Unset CACHE_DIR or set a real writable path (e.g. $HOME/hf_cache)."
+        )
+        return None
+    try:
+        Path(raw).mkdir(parents=True, exist_ok=True)
+    except OSError as e:
+        print(f"WARNING: CACHE_DIR={raw!r} is not usable ({e}); using Hugging Face default cache.")
+        return None
+    return raw
+
+
+CACHE_DIR = _resolve_hf_cache_dir()  # None -> HF default cache
 DATA_DIR = os.path.join(os.getcwd(), "data")    #where the steering_vectors/outputs will be created
 
 
