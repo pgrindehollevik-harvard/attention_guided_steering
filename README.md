@@ -42,4 +42,4 @@ python 4_visualize_scores.py
 
 ### 6) Notes
 
-Custom concepts: `-c custom` + `data/concepts/custom.txt`. `run_first_five` in some scripts limits concepts for quick tests. **Colleague-facing tips:** **`docs/colleague_steering_evidence.md`**. **Sample generations:** **`docs/sample_outputs.md`**.
+Custom concepts: `-c custom` + `data/concepts/custom.txt`. `run_first_five` in some scripts limits concepts for quick tests.
