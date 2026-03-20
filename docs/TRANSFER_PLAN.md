@@ -1,6 +1,6 @@
 # Steering Vector Transfer (primary focus)
 
-**Scope:** Transfer steering vectors between **Llama 3.1 70B** and **Llama 3.3 70B** (same hidden size, same scale). Following feedback from Parmida: remove the dimensionality gap first and ask whether a map \(v_{\text{3.3}} \approx W\, v_{\text{3.1}}\) exists.
+**Scope:** Transfer steering vectors between **Llama 3.1** and **Llama 3.3** at the **same parameter scale** (e.g. **70B↔70B** or **8B↔8B**; same hidden size per pair). Following feedback from Parmida: remove the dimensionality gap first and ask whether a map \(v_{\text{3.3}} \approx W\, v_{\text{3.1}}\) exists. A **8B pilot** (`llama_3.1_8b` ↔ `llama_3.3_8b`) is supported for smaller GPUs (~22GB L4); see `transfer/README.md`.
 ---
 
 ## Scientific question
@@ -16,10 +16,12 @@ Do concept steering directions learned on **Llama 3.1 70B-Instruct** align with 
 
 | Model | Typical hidden \(d\) | Layers |
 |-------|---------------------|--------|
+| Llama 3.1 8B | 4096 | 32 |
+| Llama 3.3 8B | 4096 | 32 |
 | Llama 3.1 70B | 8192 | 80 |
 | Llama 3.3 70B | 8192 | 80 |
 
-Same \(d\) ⇒ per layer, \(W_\ell \in \mathbb{R}^{d \times d}\) maps activations (and directions) in the **same** space. You still need **layer index alignment** if `num_hidden_layers` ever differs; start with **same index \(\ell\)** for both if configs match.
+Same \(d\) within a size tier ⇒ per layer, \(W_\ell \in \mathbb{R}^{d \times d}\) maps activations (and directions) in the **same** space. You still need **layer index alignment** if `num_hidden_layers` ever differs; start with **same index \(\ell\)** for both if configs match.
 
 ---
 
@@ -89,7 +91,7 @@ Implemented in-repo (see **`transfer/README.md`** for commands):
 | Piece | Location |
 |-------|----------|
 | Tokenizer-agnostic training prompts | `datasets.training_user_contents_and_labels` |
-| Collect activations (one 70B / run) | `transfer/collect_paired_activations.py` |
+| Collect activations (one model / run) | `transfer/collect_paired_activations.py` |
 | Ridge fit per layer | `transfer/merge_and_fit_mapping.py` |
 | Steer target with mapped directions | `transfer/steer_with_transferred.py` |
 | Paths / layer list helper | `transfer/transfer_utils.py` |
@@ -103,10 +105,10 @@ Implemented in-repo (see **`transfer/README.md`** for commands):
 ### Phase 1 — `transfer/collect_paired_activations.py`
 
 - CLI: `--model`, `--out_path`, `--concept_type`, `--max_prompts`, `--rep_token` (e.g. last token vs max-attn — mirror main pipeline).
-- Loop: load **one** 70B → run prompts → save activations → unload.
+- Loop: load **one** model (8B or 70B) → run prompts → save activations → unload.
 - Run twice (3.1 then 3.3) with shared manifest (e.g. JSON list of prompt indices + text).
 
-**Output:** `data/paired_activations/{run_id}_llama_3.1_70b.npz`, `..._llama_3.3_70b.npz`.
+**Output:** e.g. `data/paired_activations/acts_llama_3.1_70b_*.npz` and `acts_llama_3.3_70b_*.npz` (or `..._8b_...` for the 8B pilot).
 
 ### Phase 2 — `transfer/merge_and_fit_mapping.py`
 
@@ -147,7 +149,7 @@ data/
 
 ## CLI sketch
 
-- `collect_paired_activations.py`: `--model_name llama_3.1_70b | llama_3.3_70b`, `--manifest prompts.jsonl`, `--out_dir ...`
+- `collect_paired_activations.py`: `--model_name` includes `llama_3.1_8b | llama_3.3_8b | llama_3.1_70b | llama_3.3_70b`, optional `--manifest prompts.jsonl`, `--out_dir ...`
 - `merge_and_fit_mapping.py`: `--src_npz`, `--tgt_npz`, `--out_dir`, `--rank` (optional low-rank)
 
 ---
@@ -162,7 +164,11 @@ data/
 
 ---
 
+## Done in-repo: 8B ↔ 8B version transfer (pilot)
+
+- `llama_3.1_8b` (Unsloth 4-bit) ↔ `llama_3.3_8b` (gated Meta + dynamic NF4 in `utils.select_llm`). Same \(d\)=4096 and depth as 3.1 8B ⇒ same ridge pipeline as 70B.
+
 ## Deferred: 8B → 70B (later repo phase or separate doc)
 
 - Requires \(W \in \mathbb{R}^{8192 \times 4096}\) and **depth alignment** (32 vs 80 layers).  
-- Revisit after 3.1↔3.3 70B results are in.
+- Revisit after same-scale version transfer (8B or 70B) looks promising.

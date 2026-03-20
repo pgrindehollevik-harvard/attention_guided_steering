@@ -1,4 +1,6 @@
-## Attention-guided steering 
+## Attention-guided steering
+
+**Upstream:** This codebase is an **extension of** the original public project **[pdavar/attention_guided_steering](https://github.com/pdavar/attention_guided_steering)**. The core pipeline (scripts `0_`–`4_`, RFM steering, data layout) follows that repo. Extensions include **`transfer/`** (cross-version steering) and **targeted edits** to shared files such as **`utils.py`** and **`args.py`** (e.g. extra `model_name` ids, loading/VRAM fixes) so new behavior stays on the same APIs—not only new folders. See **`docs/UPSTREAM.md`** for the full split (new paths vs. modified upstream files).
 
 Python scripts `0_visualize_attn.py`–`4_visualize_scores.py` implement the full workflow for extracting attention-to-prefix, extracting concept vectors, generating steered outputs, evaluating them with GPT-4o, and summarizing scores.
 
@@ -22,7 +24,7 @@ pip install -r requirements.txt
 ### 2) Shared CLI flags
 `args.py` defines common flags (defaults in parentheses):
 - `--rep_token/-t` (`max_attn_per_layer`): token position or strategy for representation.
-- `--model_name/-m` (`llama_3.1_8b`): see `utils.select_llm` for allowed IDs.
+- `--model_name/-m` (`llama_3.1_8b`): see `utils.select_llm` for allowed IDs (includes **`llama_3.3_8b`**, gated Meta + dynamic 4-bit; see `transfer/README.md`).
 - `--concept_type/-c` (`fears`): one of `fears|personalities|moods|places|personas|jailbreaking|custom`.
 - `--control_method/-cm` (`rfm`): steering method.
 - `--version/-v` (`1`): test prompt version.

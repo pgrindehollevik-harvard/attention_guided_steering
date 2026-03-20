@@ -5,10 +5,17 @@ Steer the *target* model using directions mapped from the *source* model.
 Loads source RFM directions, applies v_tgt = normalize(X.T @ v_src) per layer using
 W from merge_and_fit_mapping.py, then runs generation on the target LLM.
 
-Example:
+Example (70B):
   python transfer/steer_with_transferred.py \\
     --w_pkl data/transfer_mappings/W_llama_3.1_70b_to_llama_3.3_70b_fears_fire_W.pkl \\
     --source_model llama_3.1_70b --target_model llama_3.3_70b \\
+    -c fears --concept fire -t max_attn_per_layer -l soft \\
+    --prompt "What is the scariest thing in the world?"
+
+Example (8B):
+  python transfer/steer_with_transferred.py \\
+    --w_pkl data/transfer_mappings/W_llama_3.1_8b_to_llama_3.3_8b_fears_fire_W.pkl \\
+    --source_model llama_3.1_8b --target_model llama_3.3_8b \\
     -c fears --concept fire -t max_attn_per_layer -l soft \\
     --prompt "What is the scariest thing in the world?"
 """
@@ -34,8 +41,16 @@ from transfer.transfer_utils import ensure_repo_cwd, layer_indices_steered
 def parse_args():
     p = argparse.ArgumentParser(description="Steer target model with transferred directions.")
     p.add_argument("--w_pkl", required=True, help="Pickle of dict layer_idx -> X (d,d) from merge step.")
-    p.add_argument("--source_model", required=True, choices=["llama_3.1_70b", "llama_3.3_70b"])
-    p.add_argument("--target_model", required=True, choices=["llama_3.1_70b", "llama_3.3_70b"])
+    p.add_argument(
+        "--source_model",
+        required=True,
+        choices=["llama_3.1_8b", "llama_3.3_8b", "llama_3.1_70b", "llama_3.3_70b"],
+    )
+    p.add_argument(
+        "--target_model",
+        required=True,
+        choices=["llama_3.1_8b", "llama_3.3_8b", "llama_3.1_70b", "llama_3.3_70b"],
+    )
     p.add_argument("--concept_type", "-c", required=True)
     p.add_argument("--concept", required=True)
     p.add_argument(

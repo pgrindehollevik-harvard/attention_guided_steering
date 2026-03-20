@@ -3,11 +3,18 @@
 Fit per-layer linear maps X such that A_tgt ≈ A_src @ X (row = one prompt).
 Transferred direction: v_tgt = normalize(X.T @ v_src) for column vectors v.
 
-Example:
+Example (70B):
   python transfer/merge_and_fit_mapping.py \\
     --src_npz data/paired_activations/acts_llama_3.1_70b_fears_fire.npz \\
     --tgt_npz data/paired_activations/acts_llama_3.3_70b_fears_fire.npz \\
     --source_model llama_3.1_70b --target_model llama_3.3_70b \\
+    -c fears --concept fire --ridge 1e-2
+
+Example (8B):
+  python transfer/merge_and_fit_mapping.py \\
+    --src_npz data/paired_activations/acts_llama_3.1_8b_fears_fire.npz \\
+    --tgt_npz data/paired_activations/acts_llama_3.3_8b_fears_fire.npz \\
+    --source_model llama_3.1_8b --target_model llama_3.3_8b \\
     -c fears --concept fire --ridge 1e-2
 """
 from __future__ import annotations

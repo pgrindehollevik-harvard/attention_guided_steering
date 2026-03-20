@@ -84,6 +84,17 @@ export STEERING_GPU_MEMORY_CAP_GB=18
 
 On a **40GB+** GPU you can force all weights on GPU 0: `export STEERING_DEVICE_MAP=cuda`.
 
+**8B (4-bit Llama):** `utils.select_llm` defaults to **`device_map="cuda"`** for any `*_8b` model id so **BitsAndBytes** does not place quantized layers on CPU (which raises `ValueError` from `quantizer_bnb_4bit`). Use `STEERING_DEVICE_MAP=auto` only if you intentionally follow Hugging Face’s 4-bit CPU/GPU offload setup.
+
+## 7. Transfer smoke test (8B, lighter)
+
+Uses **`llama_3.1_8b`** / **`llama_3.3_8b`** (see `transfer/README.md`). **`llama_3.3_8b`** loads **`meta-llama/Llama-3.3-8B-Instruct`** with HF token access.
+
+```bash
+python transfer/collect_paired_activations.py -m llama_3.1_8b -c fears --concept fire --max_prompts 5 -t -1 --datasize single
+python transfer/collect_paired_activations.py -m llama_3.3_8b -c fears --concept fire --max_prompts 5 -t -1 --datasize single
+```
+
 ## Avoid
 
 - **`pip install -r requirements.txt`** without a venv → can install into **`~/.local`** and confuse `which python`.

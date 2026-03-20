@@ -13,7 +13,14 @@ def get_args():
     parser.add_argument(
         "--model_name", "-m",
         default="llama_3.1_8b",
-        choices=["llama_3.1_8b", "llama_3.1_70b", "llama_3.3_70b", "qwen-14b", "qwen-32b"],
+        choices=[
+            "llama_3.1_8b",
+            "llama_3.3_8b",
+            "llama_3.1_70b",
+            "llama_3.3_70b",
+            "qwen-14b",
+            "qwen-32b",
+        ],
         help="Model name to use (default: llama_3.1_8b)."
     )
 

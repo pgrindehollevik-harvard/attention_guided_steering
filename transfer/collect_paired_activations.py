@@ -1,13 +1,17 @@
 #!/usr/bin/env python3
 """
-Collect per-layer hidden states for training prompts (one 70B model at a time).
+Collect per-layer hidden states for training prompts (one model load per run).
 
-Run twice (e.g. llama_3.1_70b then llama_3.3_70b) with the same --concept / --concept_type / --max_prompts,
-then use merge_and_fit_mapping.py.
+Run twice (e.g. llama_3.1_70b then llama_3.3_70b, or llama_3.1_8b then llama_3.3_8b) with the same
+--concept / --concept_type / --max_prompts, then use merge_and_fit_mapping.py.
 
-Example:
+Example (70B):
   python transfer/collect_paired_activations.py -m llama_3.1_70b -c fears --concept fire --max_prompts 200 -t -1
   python transfer/collect_paired_activations.py -m llama_3.3_70b -c fears --concept fire --max_prompts 200 -t -1
+
+Example (8B, fits ~22GB L4 more easily):
+  python transfer/collect_paired_activations.py -m llama_3.1_8b -c fears --concept fire --max_prompts 200 -t -1
+  python transfer/collect_paired_activations.py -m llama_3.3_8b -c fears --concept fire --max_prompts 200 -t -1
 """
 from __future__ import annotations
 
@@ -39,7 +43,7 @@ def parse_args():
         "--model_name",
         "-m",
         required=True,
-        choices=["llama_3.1_70b", "llama_3.3_70b"],
+        choices=["llama_3.1_8b", "llama_3.3_8b", "llama_3.1_70b", "llama_3.3_70b"],
         help="Which model to run (load only this one).",
     )
     p.add_argument(

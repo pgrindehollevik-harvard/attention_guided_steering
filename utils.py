@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import torch
 import random
-from transformers import AutoConfig, AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoConfig, AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from collections import namedtuple 
 from neural_controllers import NeuralController
 import re
@@ -107,9 +107,9 @@ def get_coefs(model_type, use_soft_labels):
             return [0.4,0.42,0.44, 0.46, 0.48, 0.5, 0.52, 0.54, 0.56, 0.58] 
         else:
             return [.4, .41, .42, .43, .44, .45]
-    elif  model_type =="llama_3.1_8b":
+    elif model_type == "llama_3.1_8b" or model_type == "llama_3.3_8b":
         if use_soft_labels:
-            return [.55, .6, .65, .7, .75, .8, 0.85,0.9,0.95,1]
+            return [.55, .6, .65, .7, .75, .8, 0.85, 0.9, 0.95, 1]
         else:
             return [.55, .6, .65, .7, .75, .8]
     elif  model_type =="qwen-14b": 
@@ -223,17 +223,33 @@ def _load_autoconfig_with_llama_rope_compat(model_id: str, cache_dir: Optional[s
         return _autoconfig_from_patched_dict(raw)
 
 
-def _model_load_device_kwargs() -> Dict[str, object]:
+def _model_load_device_kwargs(model_name: Optional[str] = None) -> Dict[str, object]:
     """
-    HF load placement. Default is device_map='auto' (requires accelerate) so 70B 4-bit can
-    spill to CPU on ~22–24GB GPUs. Old behavior: export STEERING_DEVICE_MAP=cuda
+    HF load placement for `from_pretrained`.
 
-    Optional: cap GPU footprint to leave VRAM for activations, e.g. on 22GB L4:
+    - **70B (default):** ``device_map="auto"`` so weights can spill to CPU on ~22–24GB GPUs.
+    - **8B (default):** ``device_map="cuda"`` — BitsAndBytes 4-bit models **cannot** be sharded
+      across CPU/GPU unless you use the dedicated fp32-CPU-offload path; ``auto`` often places
+      some layers on CPU and Transformers raises ``ValueError`` from ``quantizer_bnb_4bit``.
+    - **Override:** ``export STEERING_DEVICE_MAP=cuda`` or ``=auto`` (see below).
+
+    Optional: cap GPU footprint (mainly for 70B on tight cards):
         export STEERING_GPU_MEMORY_CAP_GB=18
     """
     explicit = os.environ.get("STEERING_DEVICE_MAP", "").strip().lower()
     if explicit == "cuda":
         return {"device_map": "cuda"}
+    if explicit == "auto":
+        return _model_load_device_kwargs_auto_with_cap()
+
+    # Default: 8B quantized checkpoints fit one GPU; avoid CPU offload that breaks BNB 4-bit.
+    if model_name is not None and "_8b" in model_name:
+        return {"device_map": "cuda"}
+
+    return _model_load_device_kwargs_auto_with_cap()
+
+
+def _model_load_device_kwargs_auto_with_cap() -> Dict[str, object]:
     kw: Dict[str, object] = {"device_map": "auto"}
     cap = os.environ.get("STEERING_GPU_MEMORY_CAP_GB", "").strip()
     if cap:
@@ -246,16 +262,20 @@ def _model_load_device_kwargs() -> Dict[str, object]:
 
 
 def select_llm(model_name, attn_implementation="eager"):
+    # Pre-quantized hub checkpoints (Unsloth, etc.)
     MODEL_MAP = {
-        # Llama (4-bit for 8B to fit on 24GB GPUs)
-        "llama_3.1_8b":  "unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit",
+        # Llama (4-bit for 8B/70B to fit on 24GB GPUs where applicable)
+        "llama_3.1_8b": "unsloth/Meta-Llama-3.1-8B-Instruct-bnb-4bit",
         "llama_3.1_70b": "unsloth/Meta-Llama-3.1-70B-Instruct-bnb-4bit",
         "llama_3.3_70b": "unsloth/Llama-3.3-70B-Instruct-bnb-4bit",
-
-        
         # Qwen
         "qwen-14b": "unsloth/Qwen2.5-14B-Instruct-bnb-4bit",
-        "qwen-32b": "unsloth/Qwen2.5-32B-Instruct-bnb-4bit"
+        "qwen-32b": "unsloth/Qwen2.5-32B-Instruct-bnb-4bit",
+    }
+
+    # No widely used Unsloth bnb-4bit id for Llama 3.3 8B yet: load gated Meta weights with dynamic NF4.
+    DYNAMIC_4BIT_MODEL_MAP = {
+        "llama_3.3_8b": "meta-llama/Llama-3.3-8B-Instruct",
     }
 
     # Unsloth Llama tokenizers can have quirks; load from base Meta repo for compatibility
@@ -263,23 +283,45 @@ def select_llm(model_name, attn_implementation="eager"):
         "llama_3.1_8b": "meta-llama/Meta-Llama-3.1-8B-Instruct",
         "llama_3.1_70b": "meta-llama/Meta-Llama-3.1-70B-Instruct",
         "llama_3.3_70b": "meta-llama/Llama-3.3-70B-Instruct",
+        "llama_3.3_8b": "meta-llama/Llama-3.3-8B-Instruct",
     }
 
-    if model_name not in MODEL_MAP:
-        raise ValueError(f"Unknown model_name={model_name!r}. Options: {sorted(MODEL_MAP)}")
+    known = set(MODEL_MAP) | set(DYNAMIC_4BIT_MODEL_MAP)
+    if model_name not in known:
+        raise ValueError(f"Unknown model_name={model_name!r}. Options: {sorted(known)}")
 
-    model_id = MODEL_MAP[model_name]
-    tokenizer_id = TOKENIZER_MAP.get(model_name, model_id)
+    if model_name in DYNAMIC_4BIT_MODEL_MAP:
+        model_id = DYNAMIC_4BIT_MODEL_MAP[model_name]
+        tokenizer_id = TOKENIZER_MAP.get(model_name, model_id)
+        config = _load_autoconfig_with_llama_rope_compat(model_id, CACHE_DIR)
+        bnb_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_compute_dtype=torch.float16,
+            bnb_4bit_use_double_quant=True,
+            bnb_4bit_quant_type="nf4",
+        )
+        language_model = AutoModelForCausalLM.from_pretrained(
+            model_id,
+            config=config,
+            quantization_config=bnb_config,
+            torch_dtype=torch.float16,
+            cache_dir=CACHE_DIR,
+            attn_implementation=attn_implementation,
+            **_model_load_device_kwargs(model_name),
+        ).eval()
+    else:
+        model_id = MODEL_MAP[model_name]
+        tokenizer_id = TOKENIZER_MAP.get(model_name, model_id)
 
-    config = _load_autoconfig_with_llama_rope_compat(model_id, CACHE_DIR)
+        config = _load_autoconfig_with_llama_rope_compat(model_id, CACHE_DIR)
 
-    language_model = AutoModelForCausalLM.from_pretrained(
-        model_id,
-        config=config,
-        cache_dir=CACHE_DIR,
-        attn_implementation=attn_implementation,
-        **_model_load_device_kwargs(),
-    ).eval()
+        language_model = AutoModelForCausalLM.from_pretrained(
+            model_id,
+            config=config,
+            cache_dir=CACHE_DIR,
+            attn_implementation=attn_implementation,
+            **_model_load_device_kwargs(model_name),
+        ).eval()
 
     # Keep your logic, but slightly more robust for non-Llama architectures
     archs = getattr(language_model.config, "architectures", []) or []
@@ -427,7 +469,12 @@ def generate(concept, llm, prompt, use_soft_labels = True, coefs=[0.4], control_
 
 def parse_personality_responses(response, model_type):
     # print(response)
-    if model_type == 'llama_3.1_8b' or model_type == 'llama_3.3_70b' or model_type == 'llama_3.1_70b':
+    if model_type in (
+        "llama_3.1_8b",
+        "llama_3.3_8b",
+        "llama_3.3_70b",
+        "llama_3.1_70b",
+    ):
         passage = re.split(r"\|>assistant<\|end_header_id\|>", response[1])[1]
     
     elif model_type == 'qwen-14b' or model_type == 'qwen-32b':
