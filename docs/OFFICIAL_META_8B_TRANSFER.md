@@ -16,6 +16,15 @@ So you **cannot** do “3.1 8B Instruct → 3.2 8B Instruct” using **only** of
 
 Both gated Meta IDs require **`huggingface-cli login`** and accepting the license on each model card.
 
+### 403 `GatedRepoError` / “not in the authorized list”
+
+**Access is per model repo.** Being approved for [`Meta-Llama-3.1-8B-Instruct`](https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct) does **not** automatically grant [`Meta-Llama-3-8B-Instruct`](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct). Open **each** model page while logged in, accept the license, and request access if the UI asks. Approval can take a short time.
+
+After Meta/HF grants access:
+
+1. Confirm: `huggingface-cli whoami` and that you can open the model **Files** tab in the browser.
+2. Re-run **only** the failed collect job (e.g. `-m llama_3.0_8b`). You can keep the successful `acts_llama_3.1_8b_hf_*.npz` — no need to re-collect 3.1 unless you change prompts/seed.
+
 ## Recommended **official-only** same-scale version transfer (8B)
 
 Use **Llama 3.0 ↔ 3.1** at 8B Instruct (same rough architecture tier for a linear map pilot):
