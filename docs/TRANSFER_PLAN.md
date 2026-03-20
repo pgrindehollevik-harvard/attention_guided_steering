@@ -1,104 +1,161 @@
-# Steering Vector Transfer: 8B → 70B
+# Steering Vector Transfer (primary focus)
 
-Plan for transferring steering vectors from small (8B) to large (70B) models via learned linear mapping.
+**Scope:** Transfer steering vectors between **Llama 3.1 70B** and **Llama 3.3 70B** (same hidden size, same scale). This matches feedback from collaborators: remove the dimensionality gap first and ask whether a map \(v_{\text{3.3}} \approx W\, v_{\text{3.1}}\) exists.
 
-## Goal
+**Deferred (not in this phase):** 8B → 70B transfer (different \(d\) and depth). That stays a later project so the repo stays focused.
 
-Learn \( W \) so that \( v_{70B} \approx W \cdot v_{8B} \) using paired activations (same prompts, both models). This extends the universal steering paper (Beaglehole et al., arxiv 2502.03708), which re-extracts on each model size.
+---
 
-## Dimensions
+## Scientific question
 
-| Model | Layers | Hidden size |
-|-------|--------|-------------|
-| Llama 3.1 8B | 32 | 4096 |
-| Llama 3.1/3.3 70B | 80 | 8192 |
+Do concept steering directions learned on **Llama 3.1 70B-Instruct** align with those on **Llama 3.3 70B-Instruct** via a linear map in activation space?
 
-## Implementation Plan
+- If **yes** (good \(W\) from paired activations → transferred vectors steer 3.3 well): cross-*version* transfer within 70B is plausible; then 8B→70B is the next hard step.
+- If **no**: version / training drift may dominate; mapping across sizes may need different tools.
 
-### Phase 1: Paired activation collection
+---
 
-**Script: `transfer/0_collect_paired_activations.py`**
+## Model facts (verify in `config` in code)
 
-- Load same prompts from existing dataset (e.g. `datasets.py` → fears/moods/etc.)
-- Run forward pass on **both** 8B and 70B with `output_hidden_states=True`
-- Extract last-token activations per layer (same logic as `direction_utils.get_hidden_states_and_attns`)
-- Handle layer alignment: 8B has 32 layers, 70B has 80 layers
-  - **Option A**: Map 8B layer \( \ell \) → 70B layer \( \lfloor \ell \cdot 80/32 \rfloor \) (or nearest)
-  - **Option B**: Collect all 80 layers from 70B, fit separate \( W \) per 8B-layer → 70B-layer pair
-- Save: `data/paired_activations/{concept}_{model_small}_{model_large}.npz`
-  - Keys: `acts_small` (n_prompts, n_layers_small, 4096), `acts_large` (n_prompts, n_layers_large, 8192)
+| Model | Typical hidden \(d\) | Layers |
+|-------|---------------------|--------|
+| Llama 3.1 70B | 8192 | 80 |
+| Llama 3.3 70B | 8192 | 80 |
 
-**Reuse:**
-- `datasets.py` → `get_dataset_fn`, dataset format
-- `direction_utils.get_hidden_states_and_attns` logic (or refactor to share)
-- `utils.select_llm` for model loading
+Same \(d\) ⇒ per layer, \(W_\ell \in \mathbb{R}^{d \times d}\) maps activations (and directions) in the **same** space. You still need **layer index alignment** if `num_hidden_layers` ever differs; start with **same index \(\ell\)** for both if configs match.
 
-### Phase 2: Learn linear mapping \( W \)
+---
 
-**Script: `transfer/1_learn_mapping.py`**
+## VRAM: avoid OOM with two 70Bs
 
-- Load paired activations
-- For each (small_layer, large_layer) pair:
-  - Fit \( W \in \mathbb{R}^{8192 \times 4096} \) s.t. \( \text{acts\_large}[:, L] \approx W \cdot \text{acts\_small}[:, \ell] \)
-  - Minimize \( \| X_{large} - W X_{small}^T \|^2 \) → closed form: \( W = X_{large}^T (X_{small}^T)^+ \) or ridge regression
-- Save: `data/transfer_mappings/W_{model_small}_{model_large}_layer{small}_{large}.npy`
+Two 4-bit 70B models loaded together often need **~70–90+ GB** VRAM, which many setups do not have. Default design: **never hold both full models on GPU at once.**
 
-**Layer alignment strategy:**
-- Start simple: 1:1 by relative depth, e.g. 8B layer 16 → 70B layer 40
-- Mapping: `large_layer = round(small_layer * (n_layers_large - 1) / (n_layers_small - 1))`
+### Recommended: two-pass activation collection
 
-### Phase 3: Transfer and evaluate
+1. **Pass A — source model only** (e.g. 3.1 70B)  
+   - Load model → for each prompt: forward, `output_hidden_states=True`, extract chosen token’s hidden state per layer → append to CPU/disk buffers.  
+   - Save `acts_3.1.npz` (or shard by chunk).  
+   - `del model`; `torch.cuda.empty_cache()`.
 
-**Script: `transfer/2_steer_with_transferred.py`**
+2. **Pass B — target model only** (e.g. 3.3 70B)  
+   - **Identical prompt list** (same strings, same chat template per model if tokenizers differ — see below).  
+   - Save `acts_3.3.npz`.
 
-- Load 8B concept vectors from `data/directions/`
-- Load learned \( W \) per layer
-- Compute \( v_{70B} = W \cdot v_{8B} \), normalize
-- Steer 70B using transferred vectors (reuse `generation_utils.hook_model`, `NeuralController._controlled_generate`)
-- Compare to: (a) original 70B, (b) re-extracted 70B vectors (if available)
+3. **Offline**  
+   - Align prompts by index, fit \(W_\ell\), evaluate transfer. **No** GPU needed for fitting if matrices fit in RAM (or use low-rank / chunked solves).
 
-**Script: `transfer/3_evaluate_transfer.py`**
+### Other VRAM knobs
 
-- Run evaluation prompts (from `data/evaluation_prompts/`)
-- Compare steered outputs: transferred vs re-extracted vs no steering
-- Option: use GPT-4o judge (like `3_evaluate_steered_outputs.py`) for automated scoring
+| Technique | Role |
+|-----------|------|
+| **4-bit / NF4** (already in `utils.select_llm`) | Keep inference footprint low. |
+| **Batch size 1** | One prompt per forward during collection. |
+| **`torch.inference_mode()`** | No autograd graph. |
+| **Store float16/float32 on CPU or disk** | Activations: `(n_prompts, n_layers, d)`; prefer `float16` on disk to halve size. |
+| **Optional: `device_map` CPU offload** | If one model barely fits, offload some layers to CPU (slower, saves VRAM). |
+| **Subset of layers** | For debugging, collect/fit only layers \(\{1,\ldots,L\}\) you actually steer. |
 
-### Phase 4: Generalization (optional)
+### Tokenizer / template caveat
 
-- Fit \( W \) on one concept (e.g. "fear of fire")
-- Test on other concepts: does the same \( W \) transfer other 8B vectors?
-- If not, may need concept-specific or per-concept mappings
+3.1 and 3.3 may use the same chat template, but **token IDs can differ** slightly. For strict pairing:
 
-## File structure
+- Store **raw prompt strings** (after `apply_chat_template` for **that** model), or  
+- Store **text** + apply each model’s template when collecting so each model sees the right special tokens.
+
+Paired rows must mean “same user intent,” not necessarily identical token sequences.
+
+### Fitting \(W\): memory on CPU
+
+Full \(W_\ell \in \mathbb{R}^{8192 \times 8192}\) is ~268M floats/layer (~1 GB/layer in fp32). **80 layers** ⇒ large aggregate storage. Practical options for v1:
+
+- **Low-rank \(W_\ell \approx U_\ell V_\ell^\top\)** with small rank \(r\) (e.g. 256–1024), or  
+- **Ridge regression** with randomized / iterative solvers if you only need \(W v\) for known \(v\).
+
+Document chosen approach in code comments; start with **one layer + one concept** to validate pipeline before scaling.
+
+---
+
+## Implementation status
+
+Implemented in-repo (see **`transfer/README.md`** for commands):
+
+| Piece | Location |
+|-------|----------|
+| Tokenizer-agnostic training prompts | `datasets.training_user_contents_and_labels` |
+| Collect activations (one 70B / run) | `transfer/collect_paired_activations.py` |
+| Ridge fit per layer | `transfer/merge_and_fit_mapping.py` |
+| Steer target with mapped directions | `transfer/steer_with_transferred.py` |
+| Paths / layer list helper | `transfer/transfer_utils.py` |
+
+`evaluate_transfer.py` is still optional (reuse `3_evaluate_steered_outputs.py` patterns if needed).
+
+---
+
+## Implementation phases (repo)
+
+### Phase 1 — `transfer/collect_paired_activations.py`
+
+- CLI: `--model`, `--out_path`, `--concept_type`, `--max_prompts`, `--rep_token` (e.g. last token vs max-attn — mirror main pipeline).
+- Loop: load **one** 70B → run prompts → save activations → unload.
+- Run twice (3.1 then 3.3) with shared manifest (e.g. JSON list of prompt indices + text).
+
+**Output:** `data/paired_activations/{run_id}_llama_3.1_70b.npz`, `..._llama_3.3_70b.npz`.
+
+### Phase 2 — `transfer/merge_and_fit_mapping.py`
+
+- Load both NPZs, assert aligned row counts.
+- Per layer \(\ell\): fit \(W_\ell\) (full or low-rank) minimizing \(\|A^{(3.3)}_\ell - A^{(3.1)}_\ell W_\ell^\top\|_F\) or equivalent (define convention to match your steering hook).
+- Save mappings under `data/transfer_mappings/`.
+
+### Phase 3 — `transfer/steer_with_transferred.py`
+
+- Load **target** model (e.g. 3.3) + native directions vs **transferred** directions: \( \tilde{v}^{(3.3)}_\ell = W_\ell v^{(3.1)}_\ell \) (normalize after apply — match existing steering code).
+- Reuse `generation_utils.hook_model` / `NeuralController` patterns from `2_steer.py`.
+
+### Phase 4 — `transfer/evaluate_transfer.py` (optional v1)
+
+- Same eval prompts as main repo; compare GPT-4o or human checklist: native 3.3 vs transferred-from-3.1 vs baseline.
+
+### Shared — `transfer/transfer_utils.py`
+
+- Manifest I/O, layer indexing, dtype/shape checks, paths under `data/`.
+
+---
+
+## Suggested file layout
 
 ```
 transfer/
-├── 0_collect_paired_activations.py
-├── 1_learn_mapping.py
-├── 2_steer_with_transferred.py
-├── 3_evaluate_transfer.py
-└── transfer_utils.py          # shared helpers (layer alignment, load/save)
+├── collect_paired_activations.py
+├── merge_and_fit_mapping.py
+├── steer_with_transferred.py
+├── evaluate_transfer.py          # optional first PR
+└── transfer_utils.py
 data/
-├── paired_activations/        # new
-└── transfer_mappings/         # new
+├── paired_activations/
+└── transfer_mappings/
 ```
 
-## Dependencies
+---
 
-- Same as main repo: `torch`, `transformers`, `numpy`, etc.
-- 70B model requires ~40GB+ VRAM (4-bit) or multi-GPU
+## CLI sketch
 
-## CLI flags (suggested)
+- `collect_paired_activations.py`: `--model_name llama_3.1_70b | llama_3.3_70b`, `--manifest prompts.jsonl`, `--out_dir ...`
+- `merge_and_fit_mapping.py`: `--src_npz`, `--tgt_npz`, `--out_dir`, `--rank` (optional low-rank)
 
-- `--model_small` (default: `llama_3.1_8b`)
-- `--model_large` (default: `llama_3.1_70b` or `llama_3.3_70b`)
-- `--concept` / `--concept_type`
-- `--n_prompts` (for paired collection, default: 200)
+---
 
 ## Order of work
 
-1. **0_collect_paired_activations.py** — collect data
-2. **transfer_utils.py** — layer alignment, load/save helpers
-3. **1_learn_mapping.py** — fit \( W \)
-4. **2_steer_with_transferred.py** — apply transferred vectors
-5. **3_evaluate_transfer.py** — compare outputs
+1. `transfer_utils.py` + manifest format  
+2. `collect_paired_activations.py` (two sequential runs)  
+3. `merge_and_fit_mapping.py`  
+4. `steer_with_transferred.py` (one layer / one concept smoke test)  
+5. `evaluate_transfer.py` when steering looks sane  
+
+---
+
+## Deferred: 8B → 70B (later repo phase or separate doc)
+
+- Requires \(W \in \mathbb{R}^{8192 \times 4096}\) and **depth alignment** (32 vs 80 layers).  
+- Revisit after 3.1↔3.3 70B results are in.

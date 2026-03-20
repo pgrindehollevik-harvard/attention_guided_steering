@@ -591,6 +591,87 @@ def custom_dataset_paired(llm, prefix, SEED = 0):
     return {'inputs':formatted_data, 'labels':labels}
 
 
+def _load_statement_lines(data_dir: str, datasize: str):
+    """Load class_0 / class_1 statement lines matching *_dataset datasize rules."""
+    with open(os.path.join(data_dir, "class_0.txt"), encoding="utf-8") as f:
+        neg_statements = f.readlines()
+    with open(os.path.join(data_dir, "class_1.txt"), encoding="utf-8") as f:
+        pos_statements = f.readlines()
+    if datasize in ("double", "triple"):
+        with open(os.path.join(data_dir, "class_0_a.txt"), encoding="utf-8") as f:
+            neg_statements += f.readlines()
+        with open(os.path.join(data_dir, "class_1_a.txt"), encoding="utf-8") as f:
+            pos_statements += f.readlines()
+    if datasize == "triple":
+        with open(os.path.join(data_dir, "class_0_b.txt"), encoding="utf-8") as f:
+            neg_statements += f.readlines()
+        with open(os.path.join(data_dir, "class_1_b.txt"), encoding="utf-8") as f:
+            pos_statements += f.readlines()
+    return neg_statements, pos_statements
+
+
+def training_user_contents_and_labels(
+    concept_type: str,
+    concept: str,
+    datasize: str = "single",
+    seed: int = 0,
+):
+    """
+    Same (user_message, label) order as the corresponding *_dataset (without chat template).
+    Used to pair activations across models: each model applies its own apply_chat_template.
+    """
+    random.seed(seed)
+    data_dir = "data/general_statements/"
+    neg_statements, pos_statements = _load_statement_lines(data_dir, datasize)
+    user_contents = []
+    labels = []
+
+    if concept_type == "fears":
+        pos_prompt = (
+            "Personify someone who is terrified of {fear}.  What are your thoughts on the following statement? \nStatement: {statement}"
+        )
+        neg_prompt = "What are your thoughts on the following statement? \nStatement: {statement}"
+        pos_data = [pos_prompt.format(fear=concept, statement=s) for s in neg_statements]
+        neg_data = [neg_prompt.format(statement=s) for s in pos_statements]
+    elif concept_type == "moods":
+        pos_prompt = "Take on a {mood} mood.  What are your thoughts on the following statement? \nStatement: {statement}"
+        neg_prompt = "What are your thoughts on the following statement? \nStatement: {statement}"
+        pos_data = [pos_prompt.format(mood=concept, statement=s) for s in neg_statements]
+        neg_data = [neg_prompt.format(statement=s) for s in pos_statements]
+    elif concept_type == "personas":
+        pos_prompt = "Take on the role of {persona}.  What are your thoughts on the following statement? \nStatement: {statement}"
+        neg_prompt = "What are your thoughts on the following statement? \nStatement: {statement}"
+        pos_data = [pos_prompt.format(persona=concept, statement=s) for s in neg_statements]
+        neg_data = [neg_prompt.format(statement=s) for s in pos_statements]
+    elif concept_type == "places":
+        pos_prompt = "Personify someone who loves {place}.  What are your thoughts on the following statement? \nStatement: {statement}"
+        neg_prompt = "What are your thoughts on the following statement? \nStatement: {statement}"
+        pos_data = [pos_prompt.format(place=concept, statement=s) for s in neg_statements]
+        neg_data = [neg_prompt.format(statement=s) for s in pos_statements]
+    elif concept_type == "personalities":
+        pos_prompt = "Take on the role of an expert {personality}.  What are your thoughts on the following statement? \nStatement: {statement}"
+        neg_prompt = "What are your thoughts on the following statement? \nStatement: {statement}"
+        pos_data = [pos_prompt.format(personality=concept, statement=s) for s in neg_statements]
+        neg_data = [neg_prompt.format(statement=s) for s in pos_statements]
+    elif concept_type == "custom":
+        pos_prompt = "{prefix}  What are your thoughts on the following statement? \nStatement: {statement}"
+        neg_prompt = "What are your thoughts on the following statement? \nStatement: {statement}"
+        pos_data = [pos_prompt.format(prefix=concept, statement=s) for s in neg_statements]
+        neg_data = [neg_prompt.format(statement=s) for s in pos_statements]
+    else:
+        raise ValueError(
+            f"training_user_contents_and_labels: unsupported concept_type={concept_type!r}"
+        )
+
+    assert len(pos_data) == len(neg_data)
+    for idx in range(len(pos_data)):
+        user_contents.append(pos_data[idx])
+        labels.append(1.0)
+        user_contents.append(neg_data[idx])
+        labels.append(0.0)
+
+    return user_contents, labels
+
 
 def get_dataset_fn(concept, paired_samples = False):
     if concept == "fears":
