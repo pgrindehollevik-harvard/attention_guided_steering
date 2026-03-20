@@ -60,3 +60,7 @@ python transfer/batch_steer_transferred.py \
 ```
 
 To scale the **linear map** \(W\), re-run `collect_paired_activations` (both models) with a larger `--max_prompts`, then `merge_and_fit_mapping.py` again (same paths / new `W` filename if you change counts).
+
+**Scroll through a JSONL** (pager):
+
+`python transfer/preview_jsonl.py data/transfer_runs/fire_maxattn_v1-5.jsonl | less -R`
