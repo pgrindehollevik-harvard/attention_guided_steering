@@ -107,7 +107,12 @@ def get_coefs(model_type, use_soft_labels):
             return [0.4,0.42,0.44, 0.46, 0.48, 0.5, 0.52, 0.54, 0.56, 0.58] 
         else:
             return [.4, .41, .42, .43, .44, .45]
-    elif model_type == "llama_3.1_8b" or model_type == "llama_3.3_8b":
+    elif model_type in (
+        "llama_3.0_8b",
+        "llama_3.1_8b",
+        "llama_3.1_8b_hf",
+        "llama_3.3_8b",
+    ):
         if use_soft_labels:
             return [.55, .6, .65, .7, .75, .8, 0.85, 0.9, 0.95, 1]
         else:
@@ -249,6 +254,14 @@ def _model_load_device_kwargs(model_name: Optional[str] = None) -> Dict[str, obj
     return _model_load_device_kwargs_auto_with_cap()
 
 
+# Official gated Meta **text** 8B Instruct on HF (dynamic NF4 in select_llm).
+# Note: there is **no** meta-llama/Llama-3.2-*8B*-Instruct; Llama 3.2 on HF is 1B/3B (+ Vision).
+GATED_META_LLAMA_8B_INSTRUCT_REPOS: Dict[str, str] = {
+    "llama_3.0_8b": "meta-llama/Meta-Llama-3-8B-Instruct",
+    "llama_3.1_8b_hf": "meta-llama/Meta-Llama-3.1-8B-Instruct",
+}
+
+
 def _hf_repo_llama_33_8b() -> str:
     """
     Hub repo for ``llama_3.3_8b`` (dynamic 4-bit load).
@@ -269,6 +282,14 @@ def _hf_repo_llama_33_8b() -> str:
     if raw:
         return raw
     return "allura-forge/Llama-3.3-8B-Instruct"
+
+
+def _resolve_dynamic_4bit_hf_repo(model_name: str) -> str:
+    if model_name == "llama_3.3_8b":
+        return _hf_repo_llama_33_8b()
+    if model_name in GATED_META_LLAMA_8B_INSTRUCT_REPOS:
+        return GATED_META_LLAMA_8B_INSTRUCT_REPOS[model_name]
+    raise ValueError(f"No dynamic-4bit HF repo mapping for {model_name!r}")
 
 
 def _model_load_device_kwargs_auto_with_cap() -> Dict[str, object]:
@@ -295,8 +316,8 @@ def select_llm(model_name, attn_implementation="eager"):
         "qwen-32b": "unsloth/Qwen2.5-32B-Instruct-bnb-4bit",
     }
 
-    # No official HF repo for Llama 3.3 8B Instruct under meta-llama; load arbitrary HF id with dynamic NF4.
-    DYNAMIC_4BIT_BY_NAME = frozenset({"llama_3.3_8b"})
+    # Dynamic NF4: gated Meta 8B Instruct, optional llama_3.3_8b hub override, etc.
+    DYNAMIC_4BIT_BY_NAME = frozenset({"llama_3.3_8b"} | set(GATED_META_LLAMA_8B_INSTRUCT_REPOS))
 
     # Unsloth Llama tokenizers can have quirks; load from base Meta repo for compatibility
     TOKENIZER_MAP = {
@@ -310,9 +331,18 @@ def select_llm(model_name, attn_implementation="eager"):
         raise ValueError(f"Unknown model_name={model_name!r}. Options: {sorted(known)}")
 
     if model_name in DYNAMIC_4BIT_BY_NAME:
-        model_id = _hf_repo_llama_33_8b()
+        model_id = _resolve_dynamic_4bit_hf_repo(model_name)
         tokenizer_id = model_id
-        print(f"llama_3.3_8b: loading weights + tokenizer from Hugging Face repo {model_id!r} (override with LLAMA_33_8B_HF_REPO)")
+        if model_name == "llama_3.3_8b":
+            print(
+                f"llama_3.3_8b: loading weights + tokenizer from {model_id!r} "
+                f"(override with LLAMA_33_8B_HF_REPO)"
+            )
+        else:
+            print(
+                f"{model_name}: loading gated Meta weights + tokenizer from {model_id!r} "
+                f"(huggingface-cli login + accept license on the model card)"
+            )
         config = _load_autoconfig_with_llama_rope_compat(model_id, CACHE_DIR)
         bnb_config = BitsAndBytesConfig(
             load_in_4bit=True,
@@ -490,7 +520,9 @@ def generate(concept, llm, prompt, use_soft_labels = True, coefs=[0.4], control_
 def parse_personality_responses(response, model_type):
     # print(response)
     if model_type in (
+        "llama_3.0_8b",
         "llama_3.1_8b",
+        "llama_3.1_8b_hf",
         "llama_3.3_8b",
         "llama_3.3_70b",
         "llama_3.1_70b",

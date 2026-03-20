@@ -9,9 +9,13 @@ Example (70B):
   python transfer/collect_paired_activations.py -m llama_3.1_70b -c fears --concept fire --max_prompts 200 -t -1
   python transfer/collect_paired_activations.py -m llama_3.3_70b -c fears --concept fire --max_prompts 200 -t -1
 
-Example (8B, fits ~22GB L4 more easily):
+Example (8B Unsloth 3.1 + community/default 3.3 hub id):
   python transfer/collect_paired_activations.py -m llama_3.1_8b -c fears --concept fire --max_prompts 200 -t -1
   python transfer/collect_paired_activations.py -m llama_3.3_8b -c fears --concept fire --max_prompts 200 -t -1
+
+Example (8B official gated Meta only — Llama 3.0 vs 3.1 Instruct):
+  python transfer/collect_paired_activations.py -m llama_3.0_8b -c fears --concept fire --max_prompts 200 -t -1
+  python transfer/collect_paired_activations.py -m llama_3.1_8b_hf -c fears --concept fire --max_prompts 200 -t -1
 """
 from __future__ import annotations
 
@@ -43,7 +47,14 @@ def parse_args():
         "--model_name",
         "-m",
         required=True,
-        choices=["llama_3.1_8b", "llama_3.3_8b", "llama_3.1_70b", "llama_3.3_70b"],
+        choices=[
+            "llama_3.0_8b",
+            "llama_3.1_8b",
+            "llama_3.1_8b_hf",
+            "llama_3.3_8b",
+            "llama_3.1_70b",
+            "llama_3.3_70b",
+        ],
         help="Which model to run (load only this one).",
     )
     p.add_argument(

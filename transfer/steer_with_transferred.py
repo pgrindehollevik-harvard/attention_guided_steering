@@ -41,16 +41,16 @@ from transfer.transfer_utils import ensure_repo_cwd, layer_indices_steered
 def parse_args():
     p = argparse.ArgumentParser(description="Steer target model with transferred directions.")
     p.add_argument("--w_pkl", required=True, help="Pickle of dict layer_idx -> X (d,d) from merge step.")
-    p.add_argument(
-        "--source_model",
-        required=True,
-        choices=["llama_3.1_8b", "llama_3.3_8b", "llama_3.1_70b", "llama_3.3_70b"],
-    )
-    p.add_argument(
-        "--target_model",
-        required=True,
-        choices=["llama_3.1_8b", "llama_3.3_8b", "llama_3.1_70b", "llama_3.3_70b"],
-    )
+    _m = [
+        "llama_3.0_8b",
+        "llama_3.1_8b",
+        "llama_3.1_8b_hf",
+        "llama_3.3_8b",
+        "llama_3.1_70b",
+        "llama_3.3_70b",
+    ]
+    p.add_argument("--source_model", required=True, choices=_m)
+    p.add_argument("--target_model", required=True, choices=_m)
     p.add_argument("--concept_type", "-c", required=True)
     p.add_argument("--concept", required=True)
     p.add_argument(

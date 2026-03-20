@@ -24,7 +24,7 @@ pip install -r requirements.txt
 ### 2) Shared CLI flags
 `args.py` defines common flags (defaults in parentheses):
 - `--rep_token/-t` (`max_attn_per_layer`): token position or strategy for representation.
-- `--model_name/-m` (`llama_3.1_8b`): see `utils.select_llm` for allowed IDs (includes **`llama_3.3_8b`**, dynamic 4-bit; hub repo via `LLAMA_33_8B_HF_REPO`; see `transfer/README.md`).
+- `--model_name/-m` (`llama_3.1_8b`): see `utils.select_llm` for allowed IDs (e.g. **`llama_3.0_8b`** / **`llama_3.1_8b_hf`** for gated Meta 8B Instruct; **`llama_3.3_8b`** uses `LLAMA_33_8B_HF_REPO`; see `transfer/README.md`, **`docs/OFFICIAL_META_8B_TRANSFER.md`**).
 - `--concept_type/-c` (`fears`): one of `fears|personalities|moods|places|personas|jailbreaking|custom`.
 - `--control_method/-cm` (`rfm`): steering method.
 - `--version/-v` (`1`): test prompt version.

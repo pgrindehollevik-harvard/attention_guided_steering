@@ -14,7 +14,9 @@ def get_args():
         "--model_name", "-m",
         default="llama_3.1_8b",
         choices=[
+            "llama_3.0_8b",
             "llama_3.1_8b",
+            "llama_3.1_8b_hf",
             "llama_3.3_8b",
             "llama_3.1_70b",
             "llama_3.3_70b",

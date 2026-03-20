@@ -1,6 +1,8 @@
 # Run the 8B transfer pipeline on a GPU cluster
 
-This is the **operator checklist** for `llama_3.1_8b` ↔ `llama_3.3_8b`. It extends the upstream pipeline; see **`docs/UPSTREAM.md`**.
+This is the **operator checklist** for 8B-sized runs (e.g. `llama_3.1_8b` ↔ `llama_3.3_8b`, or **official-only** `llama_3.0_8b` ↔ `llama_3.1_8b_hf`). It extends the upstream pipeline; see **`docs/UPSTREAM.md`**.
+
+**Official Meta 8B only:** read **`docs/OFFICIAL_META_8B_TRANSFER.md`** first — there is no `meta-llama` Llama **3.2** **8B** Instruct; use **3.0 ↔ 3.1** Instruct at 8B for a gated-only pair.
 
 ## 0. One-time setup (login node or first GPU job)
 

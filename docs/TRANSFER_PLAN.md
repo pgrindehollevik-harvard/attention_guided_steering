@@ -16,8 +16,10 @@ Do concept steering directions learned on **Llama 3.1 70B-Instruct** align with 
 
 | Model | Typical hidden \(d\) | Layers |
 |-------|---------------------|--------|
+| Llama 3.0 8B Instruct (`Meta-Llama-3-8B-Instruct`) | 4096 | 32 |
 | Llama 3.1 8B | 4096 | 32 |
-| Llama 3.3 8B | 4096 | 32 |
+| Llama 3.3 8B (no official `meta-llama` HF Instruct; use community or other id) | 4096 | 32 |
+| Llama 3.2 text on HF | 1B / 3B only (no official 8B Instruct under `meta-llama`) | — |
 | Llama 3.1 70B | 8192 | 80 |
 | Llama 3.3 70B | 8192 | 80 |
 

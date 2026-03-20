@@ -1,11 +1,13 @@
-# Cross-version transfer (Llama 3.1 ↔ 3.3)
+# Cross-version transfer (same hidden size)
 
 **Upstream:** This folder is an **add-on** to the main [attention-guided steering](https://github.com/pdavar/attention_guided_steering) pipeline (`1_get_directions.py`, `2_steer.py`, `NeuralController`, etc.). It does not replace those scripts; it reuses their training prompts and direction files. Supporting changes also live in **shared** modules (e.g. **`utils.select_llm`**, **`args.py`** model list)—see **`docs/UPSTREAM.md`** for what is new vs. edited upstream files.
 
 **Idea:** Learn a per-layer linear map from paired activations on the same prompts, then map source steering directions into the target model’s space:  
 `v_tgt = normalize(X.T @ v_src)` where `X` solves `A_tgt ≈ A_src @ X` (rows = prompts).
 
-**Sizes:** Same workflow for **70B** (`llama_3.1_70b` ↔ `llama_3.3_70b`) or **8B** (`llama_3.1_8b` ↔ `llama_3.3_8b`). Hidden size matches within each pair, so \(W_\ell \in \mathbb{R}^{d \times d}\) per layer.
+**Sizes:** Same workflow for **70B** (`llama_3.1_70b` ↔ `llama_3.3_70b`) or **8B** variants. Hidden size must match within each pair, so \(W_\ell \in \mathbb{R}^{d \times d}\) per layer.
+
+**Official Meta only (8B text Instruct):** There is **no** `meta-llama` **Llama 3.2 8B Instruct** on Hugging Face (3.2 is 1B/3B text + Vision at other sizes). For a gated **meta-llama/**-only 8B pilot, use **`llama_3.0_8b`** ↔ **`llama_3.1_8b_hf`** ([`Meta-Llama-3-8B-Instruct`](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) vs [`Meta-Llama-3.1-8B-Instruct`](https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct)). See **`docs/OFFICIAL_META_8B_TRANSFER.md`**.
 
 **VRAM:** Each script loads **one** model at a time. Run collection twice, then merge on CPU. **8B** is the lighter pilot (~22GB L4 friendly); **70B** may need `device_map="auto"` / CPU offload (see below).
 
@@ -110,5 +112,6 @@ python transfer/steer_with_transferred.py \
 
 ## See also
 
+- **`docs/OFFICIAL_META_8B_TRANSFER.md`** — which `meta-llama` 8B Instruct repos exist; why 3.2 8B is not available; `llama_3.0_8b` / `llama_3.1_8b_hf`.
 - **`docs/RUN_TRANSFER_8B_CLUSTER.md`** — step-by-step checklist for running the 8B pipeline on a GPU cluster (Slurm-style splitting, Path A vs B, `fire` vs `run_first_five`).
 - **`docs/TRANSFER_PLAN.md`** — background and design notes.
