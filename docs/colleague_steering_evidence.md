@@ -79,6 +79,19 @@ python transfer/evaluate_jsonl.py \
 
 `--mode both` adds columns `gpt_steered_score` (0/1) and a short `gpt_steered_raw` explanation.
 
+**Visual report (prompt + baseline + steered + full GPT text)** — open in a browser or download and open locally:
+
+```bash
+export OPENAI_API_KEY=sk-...
+python transfer/evaluate_jsonl.py \
+  --in_jsonl data/transfer_runs/colleague_demo_fears.jsonl \
+  --out_report data/transfer_runs/colleague_demo_fears_report.html \
+  --out_csv data/transfer_runs/colleague_demo_fears_eval.csv \
+  --mode both
+```
+
+`--out_report` **always** calls the GPT judge (same rubric as `3_evaluate`). You can omit `--out_csv` if you only want the HTML.
+
 **Why only `fire` in multi-concept?** Other concepts were skipped because **`rfm_<concept>_tokenidx_max_attn_per_layer_...pkl`** (and/or `W_...`) was missing. Run `0_visualize_attn` + `1_get_directions` + transfer collect/merge for each concept, or use **`--concepts fire`** until those exist.
 
 ---
