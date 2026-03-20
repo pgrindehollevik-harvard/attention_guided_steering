@@ -44,6 +44,36 @@ python transfer/multi_concept_batch_steer.py \
 - Skips concepts **missing** directions or `W` (prints `[skip]`).
 - **5 prompts × N concepts** rows (default versions 1–5).
 
+---
+
+## Triple compare: baseline → native source → transfer target
+
+For **multiple steering strengths** and **extra prompts**, use `batch_triple_compare.py`. Each JSONL row has:
+
+1. **`baseline`** — target model, no hook  
+2. **`native_source_steered`** — source model + native RFM directions  
+3. **`transfer_target_steered`** — target model + mapped directions  
+
+**More questions:** keep default `--versions 1,2,3,4,5` and add `--prompts_file path.txt` (one user prompt per line; copy from `data/transfer_eval_prompts_extra.example.txt`).
+
+**More coefficients:** e.g. `--coefs 0.5,0.65,0.75,0.85,0.95` → rows = concepts × prompts × coefs.
+
+```bash
+python transfer/batch_triple_compare.py \
+  --source_model llama_3.0_8b --target_model llama_3.1_8b_hf \
+  -c fears -t max_attn_per_layer -l soft \
+  --concepts fire,bathing \
+  --coefs 0.55,0.65,0.75,0.85 \
+  --versions 1,2,3,4,5 \
+  --prompts_file data/transfer_eval_prompts_extra.txt \
+  --overwrite \
+  --out_jsonl data/transfer_runs/triple_demo.jsonl
+```
+
+VRAM: default **unloads** the target between baseline and native, then reloads for transfer (three load phases). With enough GPU memory, `--keep_target_loaded` skips the final reload (faster).
+
+Then **`evaluate_jsonl.py`** HTML report shows **three numbered blocks** in order; GPT judge still scores **transfer** steered text (same `phobia_eval_v*` templates; extra prompts use `eval_version=1` rubric — caveat if the question differs strongly).
+
 **Browse:**
 
 ```bash

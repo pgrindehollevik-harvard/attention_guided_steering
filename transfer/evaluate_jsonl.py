@@ -79,7 +79,7 @@ def write_html_report(
     in_jsonl: str,
     gpt_model: str,
 ) -> None:
-    """rows: dicts with keys prompt, concept, version, coef, b_txt, s_txt, gpt_score, gpt_full, br, sr."""
+    """Supports legacy (baseline + steered) or triple (baseline + native + transfer)."""
     path.parent.mkdir(parents=True, exist_ok=True)
     parts = [
         "<!DOCTYPE html><html><head><meta charset='utf-8'>",
@@ -89,6 +89,7 @@ def write_html_report(
         "h1{font-size:1.25rem;}",
         "section{border:1px solid #ccc;border-radius:8px;padding:1rem;margin-bottom:1.5rem;background:#fafafa;}",
         "h2{margin:0 0 .75rem;font-size:1.05rem;color:#222;}",
+        ".step{font-weight:700;color:#0d47a1;margin:1rem 0 .35rem;}",
         ".meta{color:#555;font-size:.9rem;margin-bottom:.5rem;}",
         "pre{white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid #ddd;padding:.75rem;border-radius:6px;font-size:.88rem;}",
         ".gpt{background:#f0f7ff;border-color:#b3d4fc;}",
@@ -101,26 +102,40 @@ def write_html_report(
     ]
     for i, r in enumerate(rows, 1):
         sc = int(r.get("gpt_score", -1))
-        badge = f"<span class='score s{sc}'>GPT score: {sc}</span>" if sc in (0, 1) else ""
+        badge = f"<span class='score s{sc}'>GPT score (transfer): {sc}</span>" if sc in (0, 1) else ""
+        triple = r.get("triple")
+        pid = r.get("prompt_id", "")
+        pid_s = f" &middot; prompt <code>{html.escape(str(pid))}</code>" if pid else ""
         parts.append("<section>")
         parts.append(
-            f"<h2>#{i} &mdash; concept <strong>{html.escape(str(r['concept']))}</strong> "
-            f"&middot; version {r['version']} &middot; coef {html.escape(str(r['coef']))} {badge}</h2>"
+            f"<h2>#{i} &mdash; <strong>{html.escape(str(r['concept']))}</strong>"
+            f"{pid_s} &middot; eval v{r.get('eval_version', r.get('version', ''))} &middot; coef {html.escape(str(r['coef']))} {badge}</h2>"
         )
         parts.append("<p><strong>User prompt</strong></p>")
         parts.append(f"<pre>{html.escape(r['prompt'])}</pre>")
         parts.append(
-            f"<p class='meta'>Chars: baseline {r['baseline_chars']} &middot; steered {r['steered_chars']} "
-            f"&middot; repeat frac: {r['baseline_repeat_frac']:.4f} / {r['steered_repeat_frac']:.4f}</p>"
+            f"<p class='meta'>{html.escape(r.get('metrics_line', ''))}</p>"
         )
-        parts.append("<p><strong>Baseline (assistant text only)</strong></p>")
+        parts.append("<p class='step'>1) Baseline — target model, no steering</p>")
         parts.append(f"<pre>{html.escape(r['b_txt'])}</pre>")
-        parts.append("<p><strong>Steered (assistant text only)</strong></p>")
-        parts.append(f"<pre>{html.escape(r['s_txt'])}</pre>")
-        parts.append("<p><strong>GPT judge (full response)</strong></p>")
+        if triple:
+            parts.append(
+                f"<p class='step'>2) Native steered — source <code>{html.escape(str(r.get('source_model','')))}</code></p>"
+            )
+            parts.append(
+                f"<pre>{html.escape(r.get('n_txt') or '(missing / skipped)')}</pre>"
+            )
+            parts.append(
+                f"<p class='step'>3) Transfer steered — target <code>{html.escape(str(r.get('target_model','')))}</code></p>"
+            )
+            parts.append(f"<pre>{html.escape(r.get('t_txt') or '(missing / skipped)')}</pre>")
+        else:
+            parts.append("<p class='step'>2) Steered (transferred target)</p>")
+            parts.append(f"<pre>{html.escape(r.get('s_txt', ''))}</pre>")
+        parts.append("<p><strong>GPT judge (transfer steered; full response)</strong></p>")
         parts.append(f"<pre class='gpt'>{html.escape(r.get('gpt_full') or '(no GPT call)')}</pre>")
         if r.get("steered_raw_collapsed"):
-            parts.append("<details><summary>Full steered decode (with template)</summary>")
+            parts.append("<details><summary>Full transfer decode (with template)</summary>")
             parts.append(f"<pre>{html.escape(r['steered_raw_collapsed'])}</pre></details>")
         parts.append("</section>")
     parts.append("</body></html>")
@@ -183,24 +198,42 @@ def main():
                 continue
             r = json.loads(line)
             concept = r.get("concept", "")
-            version = int(r.get("version", 0))
+            version = r.get("version", 0)
+            try:
+                version = int(version)
+            except (TypeError, ValueError):
+                version = 0
+            eval_v = int(r.get("eval_version", version) or 1)
             coef = r.get("coef", "")
             prompt = r.get("prompt") or ""
-            baseline_raw = r.get("baseline") or ""
-            steered_raw = r.get("steered") or ""
+            prompt_id = r.get("prompt_id", "")
+            baseline_raw = r.get("baseline") or r.get("baseline_target") or ""
+            transfer_raw = r.get("transfer_target_steered") or r.get("steered") or ""
+            native_raw = r.get("native_source_steered")
+            triple = "transfer_target_steered" in r or "native_source_steered" in r
 
             b_txt = extract_llama3_assistant(baseline_raw)
-            s_txt = extract_llama3_assistant(steered_raw)
+            t_txt = extract_llama3_assistant(transfer_raw)
+            n_txt = extract_llama3_assistant(native_raw) if native_raw else ""
 
             rec = {
                 "concept": concept,
+                "prompt_id": prompt_id,
                 "version": version,
+                "eval_version": eval_v,
                 "coef": coef,
                 "baseline_chars": len(b_txt),
-                "steered_chars": len(s_txt),
-                "steered_repeat_frac": round(repetition_score(s_txt), 4),
+                "steered_chars": len(t_txt),
+                "transfer_chars": len(t_txt),
+                "steered_repeat_frac": round(repetition_score(t_txt), 4),
+                "transfer_repeat_frac": round(repetition_score(t_txt), 4),
                 "baseline_repeat_frac": round(repetition_score(b_txt), 4),
             }
+            if triple:
+                rec["native_chars"] = len(n_txt)
+                rec["native_repeat_frac"] = round(repetition_score(n_txt), 4)
+                rec["source_model"] = r.get("source_model", "")
+                rec["target_model"] = r.get("target_model", "")
 
             gpt_full = ""
             gpt_score = -1
@@ -210,8 +243,8 @@ def main():
                         "GPT judge currently uses data/evaluation_prompts/phobia_eval_*; "
                         f"extend for concept_type={args.concept_type!r}"
                     )
-                template = utils.load_prompt("fears", str(version))
-                user_prompt = template.format(personality=concept, parsed_response=s_txt)
+                template = utils.load_prompt("fears", str(eval_v))
+                user_prompt = template.format(personality=concept, parsed_response=t_txt)
                 out = client.chat.completions.create(
                     messages=[{"role": "user", "content": user_prompt}],
                     temperature=0.0,
@@ -226,25 +259,39 @@ def main():
             rows_out.append(rec)
 
             if args.out_report:
-                report_rows.append(
-                    {
-                        "concept": concept,
-                        "version": version,
-                        "coef": coef,
-                        "prompt": prompt if isinstance(prompt, str) else str(prompt),
-                        "b_txt": b_txt,
-                        "s_txt": s_txt,
-                        "baseline_chars": rec["baseline_chars"],
-                        "steered_chars": rec["steered_chars"],
-                        "baseline_repeat_frac": rec["baseline_repeat_frac"],
-                        "steered_repeat_frac": rec["steered_repeat_frac"],
-                        "gpt_score": gpt_score,
-                        "gpt_full": gpt_full,
-                        "steered_raw_collapsed": steered_raw[:8000]
-                        if len(steered_raw) > 8000
-                        else steered_raw,
-                    }
-                )
+                if triple:
+                    metrics_line = (
+                        f"Chars: baseline {len(b_txt)} | native {len(n_txt)} | transfer {len(t_txt)} — "
+                        f"repeat: {rec['baseline_repeat_frac']:.4f} / "
+                        f"{rec.get('native_repeat_frac', 0):.4f} / {rec['transfer_repeat_frac']:.4f}"
+                    )
+                else:
+                    metrics_line = (
+                        f"Chars: baseline {len(b_txt)} | steered {len(t_txt)} — "
+                        f"repeat: {rec['baseline_repeat_frac']:.4f} / {rec['steered_repeat_frac']:.4f}"
+                    )
+                rr = {
+                    "concept": concept,
+                    "prompt_id": prompt_id,
+                    "version": version,
+                    "eval_version": eval_v,
+                    "coef": coef,
+                    "prompt": prompt if isinstance(prompt, str) else str(prompt),
+                    "b_txt": b_txt,
+                    "s_txt": t_txt,
+                    "t_txt": t_txt,
+                    "n_txt": n_txt,
+                    "triple": triple,
+                    "source_model": r.get("source_model", ""),
+                    "target_model": r.get("target_model", ""),
+                    "metrics_line": metrics_line,
+                    "gpt_score": gpt_score,
+                    "gpt_full": gpt_full,
+                    "steered_raw_collapsed": transfer_raw[:8000]
+                    if len(transfer_raw) > 8000
+                    else transfer_raw,
+                }
+                report_rows.append(rr)
 
     if not rows_out:
         raise ValueError("No rows read from JSONL.")
@@ -252,7 +299,38 @@ def main():
     if args.out_csv:
         out_path = Path(args.out_csv)
         out_path.parent.mkdir(parents=True, exist_ok=True)
-        fieldnames = list(rows_out[0].keys())
+        fieldnames: list[str] = []
+        seen: set[str] = set()
+        preferred = [
+            "concept",
+            "prompt_id",
+            "version",
+            "eval_version",
+            "coef",
+            "baseline_chars",
+            "native_chars",
+            "transfer_chars",
+            "steered_chars",
+            "baseline_repeat_frac",
+            "native_repeat_frac",
+            "transfer_repeat_frac",
+            "steered_repeat_frac",
+            "source_model",
+            "target_model",
+            "gpt_steered_score",
+            "gpt_steered_raw",
+        ]
+        for k in preferred:
+            if k in seen:
+                continue
+            if any(k in row for row in rows_out):
+                fieldnames.append(k)
+                seen.add(k)
+        for row in rows_out:
+            for k in row:
+                if k not in seen:
+                    fieldnames.append(k)
+                    seen.add(k)
         with open(out_path, "w", newline="", encoding="utf-8") as fp:
             w = csv.DictWriter(fp, fieldnames=fieldnames, extrasaction="ignore")
             w.writeheader()

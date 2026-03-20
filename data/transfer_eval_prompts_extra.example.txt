@@ -1,0 +1,6 @@
+# Optional extra user prompts (one per line) for transfer/batch_triple_compare.py
+# Copy to transfer_eval_prompts_extra.txt and edit; lines starting with # are ignored.
+
+Why are some people afraid of fire?
+In one sentence, what is frightening about an uncontrolled house fire?
+Explain briefly how a refrigerator keeps food cold.
