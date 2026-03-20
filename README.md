@@ -1,89 +1,41 @@
 ## Attention-guided steering
 
-**Upstream:** This codebase is an **extension of** the original public project **[pdavar/attention_guided_steering](https://github.com/pdavar/attention_guided_steering)**. The core pipeline (scripts `0_`–`4_`, RFM steering, data layout) follows that repo. Extensions include **`transfer/`** (cross-version steering) and **targeted edits** to shared files such as **`utils.py`** and **`args.py`** (e.g. extra `model_name` ids, loading/VRAM fixes) so new behavior stays on the same APIs—not only new folders. See **`docs/UPSTREAM.md`** for the full split (new paths vs. modified upstream files).
+Extension of **[pdavar/attention_guided_steering](https://github.com/pdavar/attention_guided_steering)** — same `0_`–`4_` pipeline, plus **`transfer/`** (cross-version steering) and small changes in **`utils.py`** / **`args.py`**. Long-form notes: **`docs/internal/REFERENCE.md`**.
 
-Python scripts `0_visualize_attn.py`–`4_visualize_scores.py` implement the full workflow for extracting attention-to-prefix, extracting concept vectors, generating steered outputs, evaluating them with GPT-4o, and summarizing scores.
+**Setup:** **`docs/SETUP.md`** · **Transfer quick run:** `make help` then `make transfer-official-8b-pipeline` (see Makefile variables).
 
 ### 1) Environment
-- Python ≥3.10 and an NVIDIA GPU with CUDA (models load in 4-bit when available).
-- **Cluster / shared machines:** use a fresh project venv and verify `which python` — see **`docs/CLUSTER_SETUP.md`**.
-```
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install --upgrade pip setuptools wheel
 
-pip install -r requirements.txt
-```
-- **70B on ~22GB GPUs:** models load with `device_map="auto"` (CPU offload if needed). Optional: `STEERING_GPU_MEMORY_CAP_GB=18`. Force all on GPU 0: `STEERING_DEVICE_MAP=cuda` (needs enough VRAM).
-- Set your OpenAI key for evaluations (needed for script `3_evaluate_steered_outputs.py`): `export OPENAI_API_KEY="<your-key-here>"`.
-- Set Hugging Face auth if the chosen model requires it (`huggingface-cli login`).
-- Required data already lives under `data/`. Attention-to-prefixes, directions (steering vectors), and steered outputs are written beside it (e.g., `data/attention_to_prompt`, `data/directions`, `data/cached_outputs`).
-- To steer towrads a custom concept that is not already listed under the 5 concept classes in `data/concepts`, use the flag `-c custom` and insert your entire prefix in the `data/concepts/custom.txt` file.
-- To test the pipeline on only the first 5 concepts in each concept class, set `run_first_five = True` at the top of the scripts. 
+Python ≥3.10, NVIDIA GPU, CUDA. `pip install -r requirements.txt` in a venv; `huggingface-cli login` for gated models. Evaluations: `export OPENAI_API_KEY=...`. Details: **`docs/SETUP.md`**.
 
-### 2) Shared CLI flags
-`args.py` defines common flags (defaults in parentheses):
-- `--rep_token/-t` (`max_attn_per_layer`): token position or strategy for representation.
-- `--model_name/-m` (`llama_3.1_8b`): see `utils.select_llm` for allowed IDs (e.g. **`llama_3.0_8b`** / **`llama_3.1_8b_hf`** for gated Meta 8B Instruct; **`llama_3.3_8b`** uses `LLAMA_33_8B_HF_REPO`; see `transfer/README.md`, **`docs/OFFICIAL_META_8B_TRANSFER.md`**).
-- `--concept_type/-c` (`fears`): one of `fears|personalities|moods|places|personas|jailbreaking|custom`.
-- `--control_method/-cm` (`rfm`): steering method.
-- `--version/-v` (`1`): test prompt version.
-- `--label/-l` (`soft`): `soft` or `hard` labels.
+### 2) Shared CLI flags (`args.py`)
+
+- `--rep_token/-t` (`max_attn_per_layer`)
+- `--model_name/-m` — see `utils.select_llm` (e.g. `llama_3.0_8b`, `llama_3.1_8b_hf`, `llama_3.1_8b`, `llama_3.3_8b`, 70B ids, Qwen)
+- `--concept_type/-c`, `--control_method/-cm`, `--version/-v`, `--label/-l`
 
 ### 3) Pipeline steps
-- **0_visualize_attn.py** – Generates a numpy array containing the attention-to-prefix for all final tokens shared by all prompts.
 
-```
-python 0_visualize_attn.py -t max_attn_per_layer -m llama_3.1_8b -c fears -cm rfm -v 1 -l soft
-```
-  - Output: `data/attention_to_prompt/attentions_meanhead_<model>_<concept>_paired_statements.npy`.
+| Step | Script | Example |
+|------|--------|---------|
+| 0 | `0_visualize_attn.py` | `python 0_visualize_attn.py -t max_attn_per_layer -m llama_3.1_8b -c fears -cm rfm -v 1 -l soft` |
+| 1 | `1_get_directions.py` | `python 1_get_directions.py -t max_attn_per_layer -m llama_3.1_8b -c fears -cm rfm -v 1 -l soft` |
+| 2 | `2_steer.py` | `python 2_steer.py -t max_attn_per_layer -m llama_3.1_8b -c fears -cm rfm -v 1 -l soft` |
+| 3 | `3_evaluate_steered_outputs.py` | needs `OPENAI_API_KEY` |
+| 4 | `4_visualize_scores.py` | `python 4_visualize_scores.py` |
 
-- **1_get_directions.py** – train and save concept vectors (directions) per concept.
+Outputs under `data/attention_to_prompt`, `data/directions`, `data/cached_outputs`, `data/csvs`.
 
-```
-python 1_get_directions.py -t max_attn_per_layer -m llama_3.1_8b -c fears -cm rfm -v 1 -l soft
-```
-  - Output: direction vectors saved under `/data/directions/`.
+### 4) Typical end-to-end
 
-- **2_steer.py** – generate original + steered completions for each concept and coefficient.
-
-```
-python 2_steer.py -t max_attn_per_layer -m llama_3.1_8b -c fears -cm rfm -v 1 -l soft
-```
-  - Output: pickled generations at `data/cached_outputs/<method>_<concept>_tokenidx<rep>_block[_softlabels]_steered_500_concepts_<model>_<version>.pkl`.
-
-- **3_evaluate_steered_outputs.py** – evaluated steered outputs with GPT-4o and pick best coef per concept.
-  - Requires `OPENAI_API_KEY` in the environment.
-```
-OPENAI_API_KEY=... python 3_evaluate_steered_outputs.py -t max_attn_per_layer -m llama_3.1_8b -c fears -cm rfm -v 1 -l soft
-```
-  - Output: CSV written to `data/csvs/<method>_<concept>_tokenidx<rep>_block[_softlabels]_gpt4o_outputs_500_concepts_<model>_<version>.csv`.
-
-- **4_visualize_scores.py** – aggregate per-method/per-rep-token scores into a summary table.
-```
-python 4_visualize_scores.py
-```
-  - Output: `data/csvs/<model>_all_scores.csv`.
-
-### 4) Typical end-to-end run
-```
-# 0) compute attention stats (needed when using max_attn_per_layer)
+```bash
 python 0_visualize_attn.py -m llama_3.1_8b -c fears
-
-# 1) learn concept vectors
 python 1_get_directions.py -m llama_3.1_8b -c fears
-
-# 2) generate steered outputs
 python 2_steer.py -m llama_3.1_8b -c fears
-
-# 3) score with GPT-4o
 OPENAI_API_KEY=... python 3_evaluate_steered_outputs.py -m llama_3.1_8b -c fears
-
-# 4) summarize scores
 python 4_visualize_scores.py
 ```
 
 ### 5) Notes
-- GPU memory: 70B models need substantial VRAM; if constrained, use `llama_3.1_8b` or adjust model choice.
-- Data: concept lists live in `data/concepts/`; general statements in `data/general_statements/`; prompt templates in `data/evaluation_prompts/`.
-- Determinism: seeds are set inside scripts, but generation can still vary across hardware/drivers.
+
+Custom concepts: `-c custom` + `data/concepts/custom.txt`. `run_first_five` in scripts limits concepts for quick tests. Transfer flow: **`transfer/README.md`** + **`make help`**.
