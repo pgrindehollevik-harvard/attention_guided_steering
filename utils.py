@@ -19,6 +19,8 @@ import generation_utils
 from tqdm import tqdm
 from pathlib import Path
 import json
+import shutil
+import tempfile
 
 from huggingface_hub import hf_hub_download
 
@@ -171,11 +173,30 @@ def get_n_common_toks(tokenizer, verbose = False):
     return n
 
 
+def _autoconfig_from_patched_dict(raw: dict) -> AutoConfig:
+    """
+    Build config from a dict. Some Transformers builds omit AutoConfig.from_dict; writing a
+    temporary config.json and using from_pretrained is portable.
+    """
+    tmpdir = tempfile.mkdtemp(prefix="hf_cfg_")
+    try:
+        cfg_path = os.path.join(tmpdir, "config.json")
+        with open(cfg_path, "w", encoding="utf-8") as f:
+            json.dump(raw, f)
+        return AutoConfig.from_pretrained(
+            tmpdir,
+            local_files_only=True,
+            trust_remote_code=False,
+        )
+    finally:
+        shutil.rmtree(tmpdir, ignore_errors=True)
+
+
 def _load_autoconfig_with_llama_rope_compat(model_id: str, cache_dir: Optional[str]) -> AutoConfig:
     """
-    Llama 3.x hub configs use rope_scaling.rope_type; older Transformers only accept type+factor
+    Llama 3.x hub configs use rope_scaling.rope_type; some stacks only accept type+factor
     in __init__ and fail inside AutoConfig.from_pretrained. Load raw config.json, add type, then
-    from_dict so course / shared venvs work without upgrading Transformers.
+    instantiate config from patched JSON.
 
     If validation still rejects extra keys, fall back to a minimal {type, factor} dict.
     """
@@ -187,7 +208,7 @@ def _load_autoconfig_with_llama_rope_compat(model_id: str, cache_dir: Optional[s
         raw = dict(raw)
         raw["rope_scaling"] = {**rs, "type": rs["rope_type"]}
     try:
-        return AutoConfig.from_dict(raw)
+        return _autoconfig_from_patched_dict(raw)
     except ValueError as e:
         if "rope_scaling" not in str(e).lower():
             raise
@@ -199,7 +220,7 @@ def _load_autoconfig_with_llama_rope_compat(model_id: str, cache_dir: Optional[s
             "type": str(rs.get("type") or rs.get("rope_type", "llama3")),
             "factor": float(rs["factor"]),
         }
-        return AutoConfig.from_dict(raw)
+        return _autoconfig_from_patched_dict(raw)
 
 
 def select_llm(model_name, attn_implementation="eager"):
