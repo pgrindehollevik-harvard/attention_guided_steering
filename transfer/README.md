@@ -22,6 +22,7 @@ Defaults: `llama_3.0_8b` → `llama_3.1_8b_hf`, `CONCEPT=fire`, `REP_TOK=-1`. Ex
 | `steer_with_transferred.py` | Load target + mapped directions; generate |
 | `batch_steer_transferred.py` | Same as above over many prompts (`test_prompts.yaml`); writes **JSONL** |
 | `multi_concept_batch_steer.py` | **Many concepts**, same prompts, one target load → one **JSONL** (for demos) |
+| `evaluate_jsonl.py` | JSONL → **CSV** (length/repetition metrics; optional **OpenAI** phobia judge) |
 
 **Prereq:** RFM `.pkl` for **source** model (`1_get_directions.py` with same `-m` as `SOURCE_MODEL`). Use the same **`-t` / `REP_TOK`** for collect, merge paths, and steer.
 

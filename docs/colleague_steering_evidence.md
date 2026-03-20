@@ -54,6 +54,35 @@ python transfer/preview_jsonl.py data/transfer_runs/colleague_demo_fears.jsonl |
 
 ---
 
+## Evaluate (after JSONL)
+
+Turn generations into a **CSV** for slides / spreadsheets.
+
+**Free metrics** (length + crude repetition; no API):
+
+```bash
+python transfer/evaluate_jsonl.py \
+  --in_jsonl data/transfer_runs/colleague_demo_fears.jsonl \
+  --out_csv data/transfer_runs/colleague_demo_fears_eval.csv \
+  --mode metrics
+```
+
+**GPT judge** on **steered** assistant text (same rubric as `3_evaluate_steered_outputs.py` / `data/evaluation_prompts/phobia_eval_v{version}.txt`). Requires `OPENAI_API_KEY`:
+
+```bash
+export OPENAI_API_KEY=...   # or use your cluster secret mechanism
+python transfer/evaluate_jsonl.py \
+  --in_jsonl data/transfer_runs/colleague_demo_fears.jsonl \
+  --out_csv data/transfer_runs/colleague_demo_fears_eval.csv \
+  --mode both
+```
+
+`--mode both` adds columns `gpt_steered_score` (0/1) and a short `gpt_steered_raw` explanation.
+
+**Why only `fire` in multi-concept?** Other concepts were skipped because **`rfm_<concept>_tokenidx_max_attn_per_layer_...pkl`** (and/or `W_...`) was missing. Run `0_visualize_attn` + `1_get_directions` + transfer collect/merge for each concept, or use **`--concepts fire`** until those exist.
+
+---
+
 ## Optional: native steering (single model, no transfer)
 
 For “does steering work **at all**?” without transfer:
@@ -80,3 +109,4 @@ For “does steering work **at all**?” without transfer:
 | `transfer/multi_concept_batch_steer.py` | Many concepts → one JSONL |
 | `transfer/batch_steer_transferred.py` | One concept → JSONL |
 | `transfer/preview_jsonl.py` | Human-readable view (`\| less -R`) |
+| `transfer/evaluate_jsonl.py` | JSONL → CSV (metrics ± GPT judge) |
