@@ -2,7 +2,7 @@
 
 Extension of **[pdavar/attention_guided_steering](https://github.com/pdavar/attention_guided_steering)** — same `0_`–`4_` pipeline, plus **`transfer/`** (cross-version steering) and small changes in **`utils.py`** / **`args.py`**. Long-form notes: **`docs/internal/REFERENCE.md`**.
 
-**Setup:** **`docs/SETUP.md`** · **Transfer quick run:** `make help` then `make transfer-official-8b-pipeline` (see Makefile variables).
+**Setup:** one-line prep on GPU: **`make prep`** then **`source .venv/bin/activate`** — see **`docs/SETUP.md`**. **Transfer:** `make help` / `make transfer-official-8b-pipeline` (or run `python …` yourself).
 
 ### 1) Environment
 
