@@ -57,4 +57,5 @@ pip install -U pip setuptools wheel && pip install -r requirements.txt
 ## More detail
 
 - **`docs/internal/REFERENCE.md`** — VRAM, HF 403, long runbooks  
-- **`transfer/README.md`** — transfer scripts overview
+- **`transfer/README.md`** — transfer scripts overview  
+- **`docs/sample_outputs.md`** — saved baseline vs steered examples (reference)

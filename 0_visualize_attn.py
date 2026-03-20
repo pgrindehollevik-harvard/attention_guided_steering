@@ -67,23 +67,36 @@ def save_attn_paired(llm, concept = 'aggressive', concept_class = 'moods', head_
 
 
 if __name__=="__main__":
-    rep_token, model_type, dataset_label, method, _, label, _ = get_args()
+    rep_token, model_type, dataset_label, method, _, label, only_concept = get_args()
     print(f"rep_token = {rep_token}")
     print(f"model_name = {model_type}")
     print(f"concept_type = {dataset_label}")
     print(f"control_method = {method}")
     print(f"labels = {label}")
+    if only_concept:
+        print(f"only_concept = {only_concept}")
     assert label in ['hard', 'soft']
-   
+
     llm = select_llm(model_name = model_type, attn_implementation = "eager")
     concept_class = dataset_label
     fname = f"data/concepts/{concept_class}.txt"
     concept_list = read_file(fname, lower=dataset_to_lower[concept_class])
+    if only_concept is not None:
+        want = only_concept.strip()
+        if dataset_to_lower[concept_class]:
+            want = want.lower()
+        concept_list = [c for c in concept_list if c == want]
+        if not concept_list:
+            raise ValueError(
+                f"No concept {want!r} in {fname} (check spelling vs data/concepts/{concept_class}.txt)"
+            )
+
+    limit_five = run_first_five and only_concept is None
     for i, concept in enumerate(concept_list):
         print(f"=== Concept = {concept} ===")
 
-        save_attn_paired(llm, concept , concept_class = concept_class, head_agg = 'mean')
-        if run_first_five and i>=5: 
+        save_attn_paired(llm, concept, concept_class=concept_class, head_agg="mean")
+        if limit_five and i >= 5:
             print("Finished running for 5 samples.")
             break
     print("Done!")

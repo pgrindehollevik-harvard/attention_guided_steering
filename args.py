@@ -56,7 +56,7 @@ def get_args():
         "--only-concept",
         default=None,
         metavar="NAME",
-        help="1_get_directions only: run a single concept (must match line in data/concepts/<type>.txt after lower/trim rules).",
+        help="Single concept: 0_visualize_attn.py and 1_get_directions.py (match data/concepts/<type>.txt after lower/trim rules).",
     )
 
     args = parser.parse_args()
