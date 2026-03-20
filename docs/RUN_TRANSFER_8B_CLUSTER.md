@@ -12,9 +12,10 @@ pip install -U pip setuptools wheel
 pip install -r requirements.txt
 ```
 
-- **Hugging Face:** `huggingface-cli login` (or `export HF_TOKEN=...`).
-- **Accept the gated model** [Llama-3.3-8B-Instruct](https://huggingface.co/meta-llama/Llama-3.3-8B-Instruct) on the HF website (same account as the token).
-- **Llama 3.1 8B** uses the Unsloth 4-bit checkpoint; **3.3 8B** loads Meta weights with **dynamic NF4** in `utils.select_llm` (needs `bitsandbytes` + GPU).
+- **Hugging Face:** `huggingface-cli login` (or `export HF_TOKEN=...`) if you use a **gated** `LLAMA_33_8B_HF_REPO`.
+- **Llama 3.3 8B hub id:** There is **no** official `meta-llama/Llama-3.3-8B-Instruct` on HF. By default, `llama_3.3_8b` loads **[allura-forge/Llama-3.3-8B-Instruct](https://huggingface.co/allura-forge/Llama-3.3-8B-Instruct)** (public). Override: `export LLAMA_33_8B_HF_REPO='org/model'`.  
+  **Do not** point the pipeline at [Meta-Llama-3-8B](https://huggingface.co/meta-llama/Meta-Llama-3-8B) — that is **Llama 3.0 base**, not Instruct. For gated **Meta Llama 3.0 Instruct** 8B only, you could set `LLAMA_33_8B_HF_REPO=meta-llama/Meta-Llama-3-8B-Instruct` (that is still **not** a 3.3 checkpoint).
+- **Llama 3.1 8B** uses the Unsloth 4-bit checkpoint; **3.3 8B** uses **dynamic NF4** in `utils.select_llm` (needs `bitsandbytes` + GPU).
 
 Optional on tight GPUs (usually unnecessary for 8B, but safe):
 
@@ -150,7 +151,8 @@ Use `--max_prompts 5` in both collect commands; keep the same value for both mod
 |--------|----------------|
 | `invalid choice: 'llama_3.1_8b'` from `collect_paired_activations.py` | Cluster checkout is **behind** the branch that adds 8B flags. `git pull` (e.g. `feature/custom-steering`) and confirm `transfer/collect_paired_activations.py` lists `llama_3.1_8b` in `--model_name` choices. |
 | `ValueError: Some modules are dispatched on the CPU or the disk` (BitsAndBytes / `quantizer_bnb_4bit`) | Happens when `device_map="auto"` puts **4-bit** layers on CPU. **Fix:** `git pull` — current `utils.py` defaults **8B** loads to `device_map="cuda"`. Or set `export STEERING_DEVICE_MAP=cuda` before running. Avoid `STEERING_DEVICE_MAP=auto` + `STEERING_GPU_MEMORY_CAP_GB` for 8B unless you know you need CPU offload (BNB needs a special offload path). |
-| 401 / gated model | HF token + model license accepted for `meta-llama/Llama-3.3-8B-Instruct`. |
+| 404 / `Repository Not Found` for 3.3 8B | `git pull` — use default `LLAMA_33_8B_HF_REPO` or set it explicitly. Official `meta-llama/Llama-3.3-8B-Instruct` does not exist on HF. |
+| 401 / gated `LLAMA_33_8B_HF_REPO` | HF token + accept license for that repo (e.g. `meta-llama/Meta-Llama-3-8B-Instruct`). |
 | `ModuleNotFoundError: torchmetrics` | `pip install -r requirements.txt` in the venv you use for `python`. |
 | `FileNotFoundError` on `.pkl` in steer | Run `1_get_directions` on **source** model; match `-t` and concept string. |
 | CUDA OOM on 8B | Rare at 4-bit on one GPU; if it happens, free other jobs on the device or request a larger-GPU node. Do **not** rely on CPU offload for 4-bit without the HF doc path above. |

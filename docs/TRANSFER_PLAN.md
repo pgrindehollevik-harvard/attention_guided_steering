@@ -166,7 +166,7 @@ data/
 
 ## Done in-repo: 8B ↔ 8B version transfer (pilot)
 
-- `llama_3.1_8b` (Unsloth 4-bit) ↔ `llama_3.3_8b` (gated Meta + dynamic NF4 in `utils.select_llm`). Same \(d\)=4096 and depth as 3.1 8B ⇒ same ridge pipeline as 70B.
+- `llama_3.1_8b` (Unsloth 4-bit) ↔ `llama_3.3_8b` (dynamic NF4; hub id from `LLAMA_33_8B_HF_REPO`, default community **Llama 3.3 8B Instruct** mirror — Meta has no official `meta-llama/Llama-3.3-8B-Instruct` on HF). Same \(d\)=4096 and depth as 3.1 8B ⇒ same ridge pipeline as 70B.
 
 ## Deferred: 8B → 70B (later repo phase or separate doc)
 

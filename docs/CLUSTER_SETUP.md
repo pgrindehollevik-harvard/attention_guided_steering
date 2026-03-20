@@ -88,7 +88,7 @@ On a **40GB+** GPU you can force all weights on GPU 0: `export STEERING_DEVICE_M
 
 ## 7. Transfer smoke test (8B, lighter)
 
-Uses **`llama_3.1_8b`** / **`llama_3.3_8b`** (see `transfer/README.md`). **`llama_3.3_8b`** loads **`meta-llama/Llama-3.3-8B-Instruct`** with HF token access.
+Uses **`llama_3.1_8b`** / **`llama_3.3_8b`** (see `transfer/README.md`). **`llama_3.3_8b`** uses **`LLAMA_33_8B_HF_REPO`** (default public [allura-forge/Llama-3.3-8B-Instruct](https://huggingface.co/allura-forge/Llama-3.3-8B-Instruct)); not `meta-llama/Meta-Llama-3-8B` (that is Llama 3.0 **base**).
 
 ```bash
 python transfer/collect_paired_activations.py -m llama_3.1_8b -c fears --concept fire --max_prompts 5 -t -1 --datasize single

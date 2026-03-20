@@ -249,6 +249,28 @@ def _model_load_device_kwargs(model_name: Optional[str] = None) -> Dict[str, obj
     return _model_load_device_kwargs_auto_with_cap()
 
 
+def _hf_repo_llama_33_8b() -> str:
+    """
+    Hub repo for ``llama_3.3_8b`` (dynamic 4-bit load).
+
+    There is **no** official ``meta-llama/Llama-3.3-8B-Instruct`` on Hugging Face (404).
+    Default is a public community mirror; override if you host your own weights:
+
+        export LLAMA_33_8B_HF_REPO='org/model-id'
+
+    For **gated Meta Llama 3.0** 8B *Instruct* (not 3.3), you may use::
+
+        export LLAMA_33_8B_HF_REPO='meta-llama/Meta-Llama-3-8B-Instruct'
+
+    Do **not** use ``Meta-Llama-3-8B`` (base) for this pipeline — it is not chat-tuned and
+    mismatches ``apply_chat_template`` usage. See model card: https://huggingface.co/meta-llama/Meta-Llama-3-8B
+    """
+    raw = os.environ.get("LLAMA_33_8B_HF_REPO", "").strip()
+    if raw:
+        return raw
+    return "allura-forge/Llama-3.3-8B-Instruct"
+
+
 def _model_load_device_kwargs_auto_with_cap() -> Dict[str, object]:
     kw: Dict[str, object] = {"device_map": "auto"}
     cap = os.environ.get("STEERING_GPU_MEMORY_CAP_GB", "").strip()
@@ -273,26 +295,24 @@ def select_llm(model_name, attn_implementation="eager"):
         "qwen-32b": "unsloth/Qwen2.5-32B-Instruct-bnb-4bit",
     }
 
-    # No widely used Unsloth bnb-4bit id for Llama 3.3 8B yet: load gated Meta weights with dynamic NF4.
-    DYNAMIC_4BIT_MODEL_MAP = {
-        "llama_3.3_8b": "meta-llama/Llama-3.3-8B-Instruct",
-    }
+    # No official HF repo for Llama 3.3 8B Instruct under meta-llama; load arbitrary HF id with dynamic NF4.
+    DYNAMIC_4BIT_BY_NAME = frozenset({"llama_3.3_8b"})
 
     # Unsloth Llama tokenizers can have quirks; load from base Meta repo for compatibility
     TOKENIZER_MAP = {
         "llama_3.1_8b": "meta-llama/Meta-Llama-3.1-8B-Instruct",
         "llama_3.1_70b": "meta-llama/Meta-Llama-3.1-70B-Instruct",
         "llama_3.3_70b": "meta-llama/Llama-3.3-70B-Instruct",
-        "llama_3.3_8b": "meta-llama/Llama-3.3-8B-Instruct",
     }
 
-    known = set(MODEL_MAP) | set(DYNAMIC_4BIT_MODEL_MAP)
+    known = set(MODEL_MAP) | set(DYNAMIC_4BIT_BY_NAME)
     if model_name not in known:
         raise ValueError(f"Unknown model_name={model_name!r}. Options: {sorted(known)}")
 
-    if model_name in DYNAMIC_4BIT_MODEL_MAP:
-        model_id = DYNAMIC_4BIT_MODEL_MAP[model_name]
-        tokenizer_id = TOKENIZER_MAP.get(model_name, model_id)
+    if model_name in DYNAMIC_4BIT_BY_NAME:
+        model_id = _hf_repo_llama_33_8b()
+        tokenizer_id = model_id
+        print(f"llama_3.3_8b: loading weights + tokenizer from Hugging Face repo {model_id!r} (override with LLAMA_33_8B_HF_REPO)")
         config = _load_autoconfig_with_llama_rope_compat(model_id, CACHE_DIR)
         bnb_config = BitsAndBytesConfig(
             load_in_4bit=True,

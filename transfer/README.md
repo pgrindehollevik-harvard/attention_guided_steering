@@ -9,7 +9,9 @@
 
 **VRAM:** Each script loads **one** model at a time. Run collection twice, then merge on CPU. **8B** is the lighter pilot (~22GB L4 friendly); **70B** may need `device_map="auto"` / CPU offload (see below).
 
-**Llama 3.3 8B weights:** `utils.select_llm("llama_3.3_8b")` loads gated **`meta-llama/Llama-3.3-8B-Instruct`** with **dynamic NF4** (`BitsAndBytesConfig`). Accept the model on Hugging Face and set `HF_TOKEN` (or `huggingface-cli login`) so download works.
+**Llama 3.3 8B weights:** Meta does **not** publish `meta-llama/Llama-3.3-8B-Instruct` on Hugging Face (that URL 404s). `utils.select_llm("llama_3.3_8b")` loads **`LLAMA_33_8B_HF_REPO`** with **dynamic NF4** (`BitsAndBytesConfig`). Default repo is public **[allura-forge/Llama-3.3-8B-Instruct](https://huggingface.co/allura-forge/Llama-3.3-8B-Instruct)** (community; review the model card). Override: `export LLAMA_33_8B_HF_REPO='your/repo'`.
+
+**Not the same as [Meta-Llama-3-8B](https://huggingface.co/meta-llama/Meta-Llama-3-8B):** that hub entry is **Llama 3.0** and the **base** (not Instruct) model. This codebase expects an **Instruct** chat checkpoint (e.g. gated **`meta-llama/Meta-Llama-3-8B-Instruct`** if you point `LLAMA_33_8B_HF_REPO` there for experiments — note that is **3.0**, not 3.3).
 
 **TODO:** Support **`max_attn_per_layer`** in collection (same token choice as `1_get_directions`) instead of only last token (`-t -1`). See `docs/TRANSFER_PLAN.md`.
 
