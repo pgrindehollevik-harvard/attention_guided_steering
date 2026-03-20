@@ -20,6 +20,7 @@ Defaults: `llama_3.0_8b` → `llama_3.1_8b_hf`, `CONCEPT=fire`, `REP_TOK=-1`. Ex
 | `collect_paired_activations.py` | One model, `output_hidden_states`, save `data/paired_activations/*.npz` |
 | `merge_and_fit_mapping.py` | Ridge \(W_\ell\); writes `data/transfer_mappings/*_W.pkl` |
 | `steer_with_transferred.py` | Load target + mapped directions; generate |
+| `batch_steer_transferred.py` | Same as above over many prompts (`test_prompts.yaml`); writes **JSONL** |
 
 **Prereq:** RFM `.pkl` for **source** model (`1_get_directions.py` with same `-m` as `SOURCE_MODEL`). Use the same **`-t` / `REP_TOK`** for collect, merge paths, and steer.
 
@@ -46,3 +47,16 @@ Defaults: `llama_3.0_8b` → `llama_3.1_8b_hf`, `CONCEPT=fire`, `REP_TOK=-1`. Ex
 Long-form (VRAM, HF 403, 3.2 vs 8B, cluster): **`docs/internal/REFERENCE.md`**.
 
 Example baseline vs steered generations: **`docs/sample_outputs.md`**.
+
+**Batch eval (e.g. all 5 fear prompts, one JSONL):**
+
+```bash
+python transfer/batch_steer_transferred.py \
+  --w_pkl data/transfer_mappings/W_llama_3.0_8b_to_llama_3.1_8b_hf_fears_fire_W.pkl \
+  --source_model llama_3.0_8b --target_model llama_3.1_8b_hf \
+  -c fears --concept fire -t max_attn_per_layer -l soft \
+  --coef 0.7 --max_tokens 150 \
+  --out_jsonl data/transfer_runs/fire_maxattn_v1-5.jsonl
+```
+
+To scale the **linear map** \(W\), re-run `collect_paired_activations` (both models) with a larger `--max_prompts`, then `merge_and_fit_mapping.py` again (same paths / new `W` filename if you change counts).
