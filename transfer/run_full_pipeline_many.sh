@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Run per-concept transfer prereqs (visualize → directions → collect ×2 → merge),
 # then batch_triple_compare + evaluate_jsonl (metrics + optional HTML/GPT).
+# Runtime (8B, one GPU): order of ~1–3 h for several concepts — see transfer/README.md.
 #
 # Usage (repo root):
 #   chmod +x transfer/run_full_pipeline_many.sh   # once
