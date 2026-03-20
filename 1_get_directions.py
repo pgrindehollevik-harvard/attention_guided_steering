@@ -6,7 +6,7 @@ import generation_utils
 import sys
 from args import get_args
 
-rep_token, model_name, concept_type, method, version, label = get_args()
+rep_token, model_name, concept_type, method, version, label, only_concept = get_args()
 
 print(f"rep_token = {rep_token}")
 print(f"model_name = {model_name}")
@@ -38,6 +38,15 @@ def main(model_name, concept_type):
                      
                      
     concept_list = read_file(fname, lower=dataset_to_lower[concept_type])
+    if only_concept is not None:
+        want = only_concept.strip()
+        if dataset_to_lower[concept_type]:
+            want = want.lower()
+        concept_list = [c for c in concept_list if c == want]
+        if not concept_list:
+            raise ValueError(
+                f"No concept {want!r} in {fname} (check spelling vs data/concepts/{concept_type}.txt)"
+            )
     dataset_fn = get_dataset_fn(concept_type, paired_samples = paired_samples)
     
     for i, concept in enumerate(concept_list):
@@ -55,7 +64,7 @@ def main(model_name, concept_type):
         del data
         torch.cuda.empty_cache()
 
-        if run_first_five and i>=5: 
+        if only_concept is None and run_first_five and i >= 5:
             print("Finished running for 5 samples.")
             break
                      

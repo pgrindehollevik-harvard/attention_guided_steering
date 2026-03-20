@@ -20,7 +20,7 @@ print("Number of GPUs available:", num_gpus)
 run_first_five = True
 
 
-rep_token, model_type, dataset_label, method, version, label = get_args()
+rep_token, model_type, dataset_label, method, version, label, _ = get_args()
 assert label in ['soft', 'hard']
 use_soft_labels = label=='soft'
 

@@ -8,10 +8,10 @@ From repo root:
 
 ```bash
 make help
-make transfer-official-8b-pipeline    # default: llama_3.0_8b -> llama_3.1_8b_hf, concept fire
+make transfer-one    # one concept: RFM dirs (--only-concept) + collect + merge + steer
 ```
 
-Override models/concept: `make transfer-collect-both SOURCE_MODEL=llama_3.1_8b TARGET_MODEL=llama_3.3_8b CONCEPT=fire`.
+Defaults: `llama_3.0_8b` → `llama_3.1_8b_hf`, `CONCEPT=fire`, `REP_TOK=-1`. Example: `make transfer-one CONCEPT=bathing`.
 
 ## Scripts
 

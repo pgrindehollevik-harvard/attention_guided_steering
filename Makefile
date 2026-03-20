@@ -32,7 +32,7 @@ ACT_SRC = data/paired_activations/acts_$(SOURCE_MODEL)_$(CONCEPT_TYPE)_$(CONCEPT
 ACT_TGT = data/paired_activations/acts_$(TARGET_MODEL)_$(CONCEPT_TYPE)_$(CONCEPT).npz
 W_PKL   = data/transfer_mappings/W_$(SOURCE_MODEL)_to_$(TARGET_MODEL)_$(CONCEPT_TYPE)_$(CONCEPT)_W.pkl
 
-.PHONY: help prep transfer-dirs transfer-collect-src transfer-collect-tgt transfer-collect-both transfer-merge transfer-steer transfer-official-8b-pipeline
+.PHONY: help prep transfer-dirs transfer-collect-src transfer-collect-tgt transfer-collect-both transfer-merge transfer-steer transfer-official-8b-pipeline transfer-one
 
 help:
 	@echo "GPU box — first time / fresh clone:"
@@ -40,15 +40,14 @@ help:
 	@echo "  source .venv/bin/activate       # each new shell (or use module system + point PYTHON=...)"
 	@echo "  huggingface-cli login           # gated Meta weights (once per account)"
 	@echo ""
-	@echo "Transfer (defaults SOURCE=$(SOURCE_MODEL) TARGET=$(TARGET_MODEL) CONCEPT=$(CONCEPT)):"
-	@echo "  make transfer-dirs              GPU — RFM directions for SOURCE"
+	@echo "One-concept transfer (default CONCEPT=$(CONCEPT), official 8B $(SOURCE_MODEL) -> $(TARGET_MODEL)):"
+	@echo "  make transfer-one               # dirs + collect both + merge + steer (same CONCEPT end-to-end)"
+	@echo "  make transfer-dirs              GPU — RFM dirs for SOURCE, only CONCEPT (--only-concept)"
 	@echo "  make transfer-collect-both      GPU — activations src then tgt"
 	@echo "  make transfer-merge             CPU OK — ridge -> $(W_PKL)"
 	@echo "  make transfer-steer             GPU — steer target"
-	@echo "  make transfer-official-8b-pipeline   all of the above in order"
 	@echo ""
-	@echo "Override any variable on the command line, e.g.:"
-	@echo "  make transfer-collect-both CONCEPT=bathing MAX_PROMPTS=50"
+	@echo "Override: make transfer-one CONCEPT=bathing  OR  SOURCE_MODEL=... TARGET_MODEL=... REP_TOK=-1 ..."
 	@echo "Using python: $(PYTHON)"
 
 # One-shot environment prep on a GPU machine (idempotent)
@@ -69,7 +68,8 @@ prep:
 	@echo "  huggingface-cli login    # if you use gated meta-llama models"
 
 transfer-dirs:
-	$(PYTHON) 1_get_directions.py -m $(SOURCE_MODEL) -c $(CONCEPT_TYPE) -t $(REP_TOK) -cm rfm -v $(V) -l $(LABEL)
+	$(PYTHON) 1_get_directions.py -m $(SOURCE_MODEL) -c $(CONCEPT_TYPE) -t $(REP_TOK) -cm rfm -v $(V) -l $(LABEL) \
+		--only-concept $(CONCEPT)
 
 transfer-collect-src:
 	$(PYTHON) transfer/collect_paired_activations.py -m $(SOURCE_MODEL) -c $(CONCEPT_TYPE) \
@@ -95,3 +95,6 @@ transfer-steer:
 		--prompt "$(PROMPT)"
 
 transfer-official-8b-pipeline: transfer-dirs transfer-collect-both transfer-merge transfer-steer
+
+# Alias: one concept, official 3.0->3.1 8B Instruct (Meta gated)
+transfer-one: transfer-official-8b-pipeline

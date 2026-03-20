@@ -67,7 +67,7 @@ def save_attn_paired(llm, concept = 'aggressive', concept_class = 'moods', head_
 
 
 if __name__=="__main__":
-    rep_token, model_type, dataset_label, method, _, label = get_args()
+    rep_token, model_type, dataset_label, method, _, label, _ = get_args()
     print(f"rep_token = {rep_token}")
     print(f"model_name = {model_type}")
     print(f"concept_type = {dataset_label}")

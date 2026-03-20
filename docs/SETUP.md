@@ -33,10 +33,12 @@ After that, use **`make help`** for transfer shortcuts, or run **any** script by
 
 ```bash
 make help
-make transfer-official-8b-pipeline   # default official 8B pair + fire; see Makefile for vars
+make transfer-one    # one CONCEPT end-to-end: dirs (--only-concept) + collect + merge + steer
 ```
 
-**Note:** `1_get_directions.py` uses `run_first_five = True` — for concept **`fire`**, use **`bathing`** or change that flag; see `docs/internal/REFERENCE.md`.
+Default: `CONCEPT=fire`, `SOURCE_MODEL=llama_3.0_8b`, `TARGET_MODEL=llama_3.1_8b_hf`, `REP_TOK=-1`. Override: `make transfer-one CONCEPT=bathing`.
+
+`1_get_directions` is limited to that concept via **`--only-concept`** (no more `run_first_five` trap for a single run).
 
 ---
 

@@ -115,7 +115,7 @@ def main(rep_token, concept_class, method, model_type, use_soft_labels, version)
 
 if __name__ == "__main__":
     
-    rep_token, model_type, dataset_label, method, version, label= get_args()
+    rep_token, model_type, dataset_label, method, version, label, _ = get_args()
     use_soft_labels = label=='soft'
     main(rep_token, dataset_label, method, model_type, use_soft_labels, version)
     

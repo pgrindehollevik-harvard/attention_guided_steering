@@ -52,6 +52,12 @@ def get_args():
         choices = ['soft', 'hard'],
         help="using hard or soft labels"
     )
+    parser.add_argument(
+        "--only-concept",
+        default=None,
+        metavar="NAME",
+        help="1_get_directions only: run a single concept (must match line in data/concepts/<type>.txt after lower/trim rules).",
+    )
 
     args = parser.parse_args()
 
@@ -61,4 +67,14 @@ def get_args():
     except ValueError:
         rep_token = args.rep_token
 
-    return rep_token, args.model_name, args.concept_type, args.control_method, args.version, args.label
+    only = args.only_concept.strip() if args.only_concept else None
+
+    return (
+        rep_token,
+        args.model_name,
+        args.concept_type,
+        args.control_method,
+        args.version,
+        args.label,
+        only,
+    )
