@@ -10,6 +10,8 @@ source .venv/bin/activate
 huggingface-cli login    # once, for gated Meta models
 ```
 
+**403 with a fine-grained token:** If login “succeeds” but `hf_hub_download` still returns **403** and says *“enable access to public gated repositories”*, open **[HF token settings](https://huggingface.co/settings/tokens)** → edit your token → turn on **access to public gated repositories** (wording may vary). Meta Llama repos are *gated*; fine-grained tokens do not include that unless you enable it. Alternatively use a **classic** read token for CLI login.
+
 After that, use **`make help`** for transfer shortcuts, or run **any** script by hand — Make does not replace the CLI.
 
 ---

@@ -173,6 +173,10 @@ Both gated Meta IDs require **`huggingface-cli login`** and accepting the licens
 
 **Access is per model repo.** Being approved for [`Meta-Llama-3.1-8B-Instruct`](https://huggingface.co/meta-llama/Meta-Llama-3.1-8B-Instruct) does **not** automatically grant [`Meta-Llama-3-8B-Instruct`](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct). Open **each** model page while logged in, accept the license, and request access if the UI asks. Approval can take a short time.
 
+### 403 “Please enable access to public gated repositories” (fine-grained token)
+
+**Fine-grained** API tokens must explicitly allow **gated** public repos. In [Hugging Face token settings](https://huggingface.co/settings/tokens), edit the token and enable **access to public gated repositories** (exact label may vary by HF UI). Then `huggingface-cli login` again or set `HF_TOKEN`. A **classic** read token also works for gated Meta models after you accept each model card in the browser.
+
 After Meta/HF grants access:
 
 1. Confirm: `huggingface-cli whoami` and that you can open the model **Files** tab in the browser.
