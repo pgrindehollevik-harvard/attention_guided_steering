@@ -32,7 +32,7 @@ ACT_SRC = data/paired_activations/acts_$(SOURCE_MODEL)_$(CONCEPT_TYPE)_$(CONCEPT
 ACT_TGT = data/paired_activations/acts_$(TARGET_MODEL)_$(CONCEPT_TYPE)_$(CONCEPT).npz
 W_PKL   = data/transfer_mappings/W_$(SOURCE_MODEL)_to_$(TARGET_MODEL)_$(CONCEPT_TYPE)_$(CONCEPT)_W.pkl
 
-.PHONY: help prep transfer-dirs transfer-collect-src transfer-collect-tgt transfer-collect-both transfer-merge transfer-steer transfer-official-8b-pipeline transfer-one
+.PHONY: help prep transfer-dirs transfer-collect-src transfer-collect-tgt transfer-collect-both transfer-merge transfer-steer transfer-official-8b-pipeline transfer-one transfer-full-many
 
 help:
 	@echo "GPU box — first time / fresh clone:"
@@ -48,6 +48,7 @@ help:
 	@echo "  make transfer-steer             GPU — steer target"
 	@echo ""
 	@echo "Override: make transfer-one CONCEPT=bathing  OR  SOURCE_MODEL=... TARGET_MODEL=... REP_TOK=-1 ..."
+	@echo "  make transfer-full-many PIPELINE_CONCEPTS=fire,bathing  # full multi-concept + triple + eval"
 	@echo "Using python: $(PYTHON)"
 
 # One-shot environment prep on a GPU machine (idempotent)
@@ -98,3 +99,9 @@ transfer-official-8b-pipeline: transfer-dirs transfer-collect-both transfer-merg
 
 # Alias: one concept, official 3.0->3.1 8B Instruct (Meta gated)
 transfer-one: transfer-official-8b-pipeline
+
+# Many concepts end-to-end: see transfer/run_full_pipeline_many.sh
+PIPELINE_CONCEPTS ?= fire
+
+transfer-full-many:
+	CONCEPTS="$(PIPELINE_CONCEPTS)" PYTHON="$(PYTHON)" bash transfer/run_full_pipeline_many.sh

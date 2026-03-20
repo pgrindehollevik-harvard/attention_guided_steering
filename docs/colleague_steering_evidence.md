@@ -2,6 +2,34 @@
 
 Use this when you want **reproducible, multi-example** evidence—not just one manual prompt.
 
+---
+
+## Run everything (one command)
+
+From **repo root**, after `source .venv/bin/activate` and `huggingface-cli login` as usual:
+
+**Bash (recommended — set comma-separated concepts):**
+
+```bash
+chmod +x transfer/run_full_pipeline_many.sh   # once per clone
+CONCEPTS="fire,bathing,spiders,heights" \
+OPENAI_API_KEY="sk-..." \
+./transfer/run_full_pipeline_many.sh
+```
+
+**Make (same script; default concepts = `fire` unless you override):**
+
+```bash
+make transfer-full-many PIPELINE_CONCEPTS=fire,bathing,spiders OPENAI_API_KEY=sk-...
+```
+
+What it does **per concept** (in order): `0_visualize_attn` (if `REP_TOK=max_attn_per_layer`) → `1_get_directions` → collect source → collect target → merge.  
+Then: **`batch_triple_compare.py`** (baseline + native + transfer, default coefs + YAML v1–5) → **`evaluate_jsonl.py`** (CSV; if `OPENAI_API_KEY` set, **HTML + GPT**).
+
+**Optional env:** `PROMPTS_FILE=data/transfer_eval_prompts_extra.txt` `COEFS=0.5,0.65,0.8` `VERSIONS=1,2,3,4,5` `SKIP_TRIPLE=1` `SKIP_EVAL=1` `REP_TOK=-1` (see script header).
+
+---
+
 ## What you are showing
 
 1. **Same model, same prompts:** for each case you show **baseline** (no hook) vs **steered** (hook on), so any difference is from steering, not from a different model load (multi-concept script loads the target **once**).

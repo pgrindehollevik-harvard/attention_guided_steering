@@ -69,3 +69,5 @@ To scale the **linear map** \(W\), re-run `collect_paired_activations` (both mod
 `python transfer/preview_jsonl.py data/transfer_runs/fire_maxattn_v1-5.jsonl | less -R`
 
 **Colleague-style bundle (multi-concept):** see **`docs/colleague_steering_evidence.md`** and `transfer/multi_concept_batch_steer.py`.
+
+**One-shot multi-concept pipeline (build + triple + eval):** `transfer/run_full_pipeline_many.sh` or `make transfer-full-many PIPELINE_CONCEPTS=fire,bathing`.
