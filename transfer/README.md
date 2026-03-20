@@ -5,6 +5,10 @@
 
 **VRAM:** Each script loads **one** 70B at a time. Run collection twice, then merge on CPU.
 
+**TODO:** Support **`max_attn_per_layer`** in collection (same token choice as `1_get_directions`) instead of only last token (`-t -1`). See `docs/TRANSFER_PLAN.md`.
+
+**~22GB GPUs (e.g. L4):** 70B 4-bit may OOM with everything on CUDA. The repo uses **`device_map="auto"`** by default so weights can spill to CPU. Optionally: `export STEERING_GPU_MEMORY_CAP_GB=18` to reserve VRAM for activations. Large GPU only: `export STEERING_DEVICE_MAP=cuda` restores all weights on GPU 0.
+
 ## Prerequisites
 
 - Install deps from repo root: `pip install -r requirements.txt` (includes **`torchmetrics`**, required by `direction_utils` / `utils.select_llm`).
@@ -25,7 +29,7 @@ python transfer/collect_paired_activations.py -m llama_3.3_70b -c fears --concep
 ```
 
 Outputs under `data/paired_activations/` (`.npz` + `.meta.json`).  
-`-t -1` = last token (simple alignment). For `max_attn_per_layer` directions, you can still collect with `-t -1` to fit `W`; the steering script loads source directions from disk using your usual `-t max_attn_per_layer`.
+`-t -1` = last token (simple alignment). Steering still loads source directions with your usual **`max_attn_per_layer`** `.pkl` files; the **mismatch** with last-token activations for \(W\) is a known limitation until TODO above is implemented.
 
 **Custom concepts:** use `-c custom --concept "<full prefix line>"` and `--datasize triple` if you use `triple` in `1_get_directions.py`.
 

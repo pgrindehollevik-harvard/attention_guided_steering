@@ -1,9 +1,6 @@
 # Steering Vector Transfer (primary focus)
 
-**Scope:** Transfer steering vectors between **Llama 3.1 70B** and **Llama 3.3 70B** (same hidden size, same scale). This matches feedback from collaborators: remove the dimensionality gap first and ask whether a map \(v_{\text{3.3}} \approx W\, v_{\text{3.1}}\) exists.
-
-**Deferred (not in this phase):** 8B → 70B transfer (different \(d\) and depth). That stays a later project so the repo stays focused.
-
+**Scope:** Transfer steering vectors between **Llama 3.1 70B** and **Llama 3.3 70B** (same hidden size, same scale). Following feedback from Parmida: remove the dimensionality gap first and ask whether a map \(v_{\text{3.3}} \approx W\, v_{\text{3.1}}\) exists.
 ---
 
 ## Scientific question
@@ -30,7 +27,7 @@ Same \(d\) ⇒ per layer, \(W_\ell \in \mathbb{R}^{d \times d}\) maps activation
 
 Two 4-bit 70B models loaded together often need **~70–90+ GB** VRAM, which many setups do not have. Default design: **never hold both full models on GPU at once.**
 
-### Recommended: two-pass activation collection
+### Plan: two-pass activation collection
 
 1. **Pass A — source model only** (e.g. 3.1 70B)  
    - Load model → for each prompt: forward, `output_hidden_states=True`, extract chosen token’s hidden state per layer → append to CPU/disk buffers.  
@@ -43,6 +40,10 @@ Two 4-bit 70B models loaded together often need **~70–90+ GB** VRAM, which man
 
 3. **Offline**  
    - Align prompts by index, fit \(W_\ell\), evaluate transfer. **No** GPU needed for fitting if matrices fit in RAM (or use low-rank / chunked solves).
+
+### Single-GPU RAM vs 70B 4-bit
+
+A **~22GB** consumer/datacenter card (e.g. L4) often **cannot** hold the full 70B 4-bit model with `device_map="cuda"`. The repo defaults to **`device_map="auto"`** so **Accelerate** can place some layers on **CPU** (slower but runs). Optionally cap GPU use to leave headroom for activations: `export STEERING_GPU_MEMORY_CAP_GB=18`. To force the old all-on-GPU behavior on a large card: `export STEERING_DEVICE_MAP=cuda`.
 
 ### Other VRAM knobs
 
@@ -72,6 +73,12 @@ Full \(W_\ell \in \mathbb{R}^{8192 \times 8192}\) is ~268M floats/layer (~1 GB/l
 - **Ridge regression** with randomized / iterative solvers if you only need \(W v\) for known \(v\).
 
 Document chosen approach in code comments; start with **one layer + one concept** to validate pipeline before scaling.
+
+---
+
+## TODO (not implemented yet)
+
+- **`collect_paired_activations.py` + `max_attn_per_layer`:** The main pipeline selects the representation token **per layer** from attention to the concept prefix (`0_visualize_attn` → `max_attn_per_layer`). Collection currently defaults to **last token** (`-t -1`) for simplicity. **To-do:** add `-t max_attn_per_layer` (and per-model attention `.npy` inputs) so activations used to fit \(W\) match the paper/repo steering setup.
 
 ---
 

@@ -76,6 +76,14 @@ python transfer/collect_paired_activations.py -m llama_3.1_70b -c fears --concep
 
 Use `--max_prompts 5` first to verify load + forward; then raise to 200.
 
+**If you see CUDA OOM while loading 70B on a ~22GB GPU:** weights use `device_map="auto"` by default (CPU offload). Optionally cap GPU bytes so forwards have headroom:
+
+```bash
+export STEERING_GPU_MEMORY_CAP_GB=18
+```
+
+On a **40GB+** GPU you can force all weights on GPU 0: `export STEERING_DEVICE_MAP=cuda`.
+
 ## Avoid
 
 - **`pip install -r requirements.txt`** without a venv → can install into **`~/.local`** and confuse `which python`.

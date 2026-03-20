@@ -223,6 +223,28 @@ def _load_autoconfig_with_llama_rope_compat(model_id: str, cache_dir: Optional[s
         return _autoconfig_from_patched_dict(raw)
 
 
+def _model_load_device_kwargs() -> Dict[str, object]:
+    """
+    HF load placement. Default is device_map='auto' (requires accelerate) so 70B 4-bit can
+    spill to CPU on ~22–24GB GPUs. Old behavior: export STEERING_DEVICE_MAP=cuda
+
+    Optional: cap GPU footprint to leave VRAM for activations, e.g. on 22GB L4:
+        export STEERING_GPU_MEMORY_CAP_GB=18
+    """
+    explicit = os.environ.get("STEERING_DEVICE_MAP", "").strip().lower()
+    if explicit == "cuda":
+        return {"device_map": "cuda"}
+    kw: Dict[str, object] = {"device_map": "auto"}
+    cap = os.environ.get("STEERING_GPU_MEMORY_CAP_GB", "").strip()
+    if cap:
+        try:
+            g = float(cap)
+            kw["max_memory"] = {0: f"{int(g)}GiB", "cpu": "256GiB"}
+        except ValueError:
+            print(f"WARNING: ignoring invalid STEERING_GPU_MEMORY_CAP_GB={cap!r}")
+    return kw
+
+
 def select_llm(model_name, attn_implementation="eager"):
     MODEL_MAP = {
         # Llama (4-bit for 8B to fit on 24GB GPUs)
@@ -254,9 +276,9 @@ def select_llm(model_name, attn_implementation="eager"):
     language_model = AutoModelForCausalLM.from_pretrained(
         model_id,
         config=config,
-        device_map="cuda",
         cache_dir=CACHE_DIR,
         attn_implementation=attn_implementation,
+        **_model_load_device_kwargs(),
     ).eval()
 
     # Keep your logic, but slightly more robust for non-Llama architectures

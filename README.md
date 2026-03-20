@@ -12,6 +12,7 @@ python -m pip install --upgrade pip setuptools wheel
 
 pip install -r requirements.txt
 ```
+- **70B on ~22GB GPUs:** models load with `device_map="auto"` (CPU offload if needed). Optional: `STEERING_GPU_MEMORY_CAP_GB=18`. Force all on GPU 0: `STEERING_DEVICE_MAP=cuda` (needs enough VRAM).
 - Set your OpenAI key for evaluations (needed for script `3_evaluate_steered_outputs.py`): `export OPENAI_API_KEY="<your-key-here>"`.
 - Set Hugging Face auth if the chosen model requires it (`huggingface-cli login`).
 - Required data already lives under `data/`. Attention-to-prefixes, directions (steering vectors), and steered outputs are written beside it (e.g., `data/attention_to_prompt`, `data/directions`, `data/cached_outputs`).
