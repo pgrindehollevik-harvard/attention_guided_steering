@@ -7,6 +7,7 @@
 
 ## Prerequisites
 
+- Install deps from repo root: `pip install -r requirements.txt` (includes **`torchmetrics`**, required by `direction_utils` / `utils.select_llm`).
 - Source **RFM directions** already extracted on the source model (e.g. `1_get_directions.py` for `llama_3.1_70b`).
 - Repo root as cwd (or any cwd; scripts add repo to `sys.path`).
 - Same `--concept`, `--concept_type`, `--max_prompts`, `--datasize`, `--seed` for both collection runs.

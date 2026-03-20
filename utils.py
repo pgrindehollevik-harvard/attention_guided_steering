@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import torch
 import random
-from transformers import AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoConfig, AutoTokenizer, AutoModelForCausalLM
 from collections import namedtuple 
 from neural_controllers import NeuralController
 import re
@@ -18,6 +18,9 @@ from matplotlib.colors import LogNorm
 import generation_utils
 from tqdm import tqdm
 from pathlib import Path
+import json
+
+from huggingface_hub import hf_hub_download
 
 
 CACHE_DIR = os.environ.get("CACHE_DIR")    #where the models will be downloaded
@@ -144,6 +147,38 @@ def get_n_common_toks(tokenizer, verbose = False):
     
     return n
 
+
+def _load_autoconfig_with_llama_rope_compat(model_id: str, cache_dir: Optional[str]) -> AutoConfig:
+    """
+    Llama 3.x hub configs use rope_scaling.rope_type; older Transformers only accept type+factor
+    in __init__ and fail inside AutoConfig.from_pretrained. Load raw config.json, add type, then
+    from_dict so course / shared venvs work without upgrading Transformers.
+
+    If validation still rejects extra keys, fall back to a minimal {type, factor} dict.
+    """
+    cfg_path = hf_hub_download(repo_id=model_id, filename="config.json", cache_dir=cache_dir)
+    with open(cfg_path, encoding="utf-8") as f:
+        raw = json.load(f)
+    rs = raw.get("rope_scaling")
+    if isinstance(rs, dict) and rs.get("rope_type") is not None and rs.get("type") is None:
+        raw = dict(raw)
+        raw["rope_scaling"] = {**rs, "type": rs["rope_type"]}
+    try:
+        return AutoConfig.from_dict(raw)
+    except ValueError as e:
+        if "rope_scaling" not in str(e).lower():
+            raise
+        rs = raw.get("rope_scaling")
+        if not isinstance(rs, dict) or "factor" not in rs:
+            raise
+        raw = dict(raw)
+        raw["rope_scaling"] = {
+            "type": str(rs.get("type") or rs.get("rope_type", "llama3")),
+            "factor": float(rs["factor"]),
+        }
+        return AutoConfig.from_dict(raw)
+
+
 def select_llm(model_name, attn_implementation="eager"):
     MODEL_MAP = {
         # Llama (4-bit for 8B to fit on 24GB GPUs)
@@ -170,8 +205,11 @@ def select_llm(model_name, attn_implementation="eager"):
     model_id = MODEL_MAP[model_name]
     tokenizer_id = TOKENIZER_MAP.get(model_name, model_id)
 
+    config = _load_autoconfig_with_llama_rope_compat(model_id, CACHE_DIR)
+
     language_model = AutoModelForCausalLM.from_pretrained(
         model_id,
+        config=config,
         device_map="cuda",
         cache_dir=CACHE_DIR,
         attn_implementation=attn_implementation,
