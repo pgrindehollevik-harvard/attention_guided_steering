@@ -21,6 +21,7 @@ Defaults: `llama_3.0_8b` → `llama_3.1_8b_hf`, `CONCEPT=fire`, `REP_TOK=-1`. Ex
 | `merge_and_fit_mapping.py` | Ridge \(W_\ell\); writes `data/transfer_mappings/*_W.pkl` |
 | `steer_with_transferred.py` | Load target + mapped directions; generate |
 | `batch_steer_transferred.py` | Same as above over many prompts (`test_prompts.yaml`); writes **JSONL** |
+| `multi_concept_batch_steer.py` | **Many concepts**, same prompts, one target load → one **JSONL** (for demos) |
 
 **Prereq:** RFM `.pkl` for **source** model (`1_get_directions.py` with same `-m` as `SOURCE_MODEL`). Use the same **`-t` / `REP_TOK`** for collect, merge paths, and steer.
 
@@ -64,3 +65,5 @@ To scale the **linear map** \(W\), re-run `collect_paired_activations` (both mod
 **Scroll through a JSONL** (pager):
 
 `python transfer/preview_jsonl.py data/transfer_runs/fire_maxattn_v1-5.jsonl | less -R`
+
+**Colleague-style bundle (multi-concept):** see **`docs/colleague_steering_evidence.md`** and `transfer/multi_concept_batch_steer.py`.

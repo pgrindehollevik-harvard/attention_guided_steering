@@ -45,8 +45,8 @@ def main():
                 continue
             r = json.loads(line)
             print(sep)
-            print(f"ROW {i + 1}  |  version={r.get('version')}  |  coef={r.get('coef')}")
-            print(f"concept={r.get('concept')}  rep_token={r.get('rep_token')}")
+            print(f"ROW {i + 1}  |  concept={r.get('concept')}  |  version={r.get('version')}  |  coef={r.get('coef')}")
+            print(f"rep_token={r.get('rep_token')}")
             print(sub)
             print("PROMPT:")
             print(r.get("prompt", ""))

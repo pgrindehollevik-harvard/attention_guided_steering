@@ -41,6 +41,12 @@ def default_mapping_path(source_model: str, target_model: str, concept_type: str
     return transfer_map_dir() / f"W_{source_model}_to_{target_model}_{concept_type}_{safe}.npz"
 
 
+def w_pkl_path(source_model: str, target_model: str, concept_type: str, concept_slug: str) -> Path:
+    """Pickle of layer -> W matrix; matches merge_and_fit_mapping.py default output."""
+    p = default_mapping_path(source_model, target_model, concept_type, concept_slug)
+    return p.with_name(p.stem + "_W.pkl")
+
+
 def layer_indices_steered(num_hidden_layers: int) -> list[int]:
     """Match 2_steer.py / NeuralController: layers 1 .. num_hidden_layers-1."""
     return list(range(1, num_hidden_layers))

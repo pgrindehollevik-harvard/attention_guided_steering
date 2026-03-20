@@ -58,4 +58,5 @@ pip install -U pip setuptools wheel && pip install -r requirements.txt
 
 - **`docs/internal/REFERENCE.md`** — VRAM, HF 403, long runbooks  
 - **`transfer/README.md`** — transfer scripts overview  
-- **`docs/sample_outputs.md`** — saved baseline vs steered examples (reference)
+- **`docs/sample_outputs.md`** — saved baseline vs steered examples (reference)  
+- **`docs/colleague_steering_evidence.md`** — multi-concept JSONL demo checklist
