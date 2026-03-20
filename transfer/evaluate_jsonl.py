@@ -53,8 +53,8 @@ def repetition_score(text: str) -> float:
     if len(words) < 8:
         return 0.0
     c = Counter(words)
-    top, _ = c.most_common(1)[0]
-    return top / len(words)
+    _word, top_count = c.most_common(1)[0]
+    return top_count / len(words)
 
 
 def parse_gpt_score(content: str) -> tuple[int, str]:
