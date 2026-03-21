@@ -1,0 +1,24 @@
+# Python / venv
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Local-only docs (keep copies on disk; not published on GitHub)
+docs/internal/
+docs/sample_outputs.md
+docs/colleague_steering_evidence.md
+
+# Large / generated artifacts (if created locally)
+data/attention_to_prompt/
+data/directions/
+data/cached_outputs/
+data/csvs/
+data/paired_activations/
+data/transfer_mappings/
+data/transfer_runs/

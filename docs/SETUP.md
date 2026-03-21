@@ -56,7 +56,6 @@ pip install -U pip setuptools wheel && pip install -r requirements.txt
 
 ## More detail
 
-- **`docs/internal/REFERENCE.md`** — VRAM, HF 403, long runbooks  
-- **`transfer/README.md`** — transfer scripts, **runtime**, one-shot pipeline  
-- **`docs/sample_outputs.md`** — short qualitative example  
-- **`docs/colleague_steering_evidence.md`** — talking points for demos
+- **`transfer/README.md`** — transfer scripts, **runtime**, multi-concept pipeline, eval  
+
+Optional **local-only** notes (not in the GitHub repo; add yourself if useful): `docs/internal/REFERENCE.md`, `docs/sample_outputs.md`, `docs/colleague_steering_evidence.md` — see `.gitignore`.

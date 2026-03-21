@@ -2,7 +2,7 @@
 
 Maps **source** RFM directions into a **target** model with per-layer linear maps \(W_\ell\) fit on paired activations. Same idea as upstream [pdavar/attention_guided_steering](https://github.com/pdavar/attention_guided_steering); scripts live in **`transfer/`**.
 
-**Cluster / env:** `make prep`, `source .venv/bin/activate`, `huggingface-cli login` — **`docs/SETUP.md`**. Deep dive (VRAM, HF 403): **`docs/internal/REFERENCE.md`**.
+**Cluster / env:** `make prep`, `source .venv/bin/activate`, `huggingface-cli login` — **`docs/SETUP.md`**. For single-concept **source → target**, start from the root **`README.md`**.
 
 ---
 
@@ -57,7 +57,7 @@ Defaults in the Makefile: `SOURCE_MODEL=llama_3.0_8b`, `TARGET_MODEL=llama_3.1_8
 | `batch_steer_transferred.py` | One concept, YAML prompts → JSONL |
 | `multi_concept_batch_steer.py` | Many concepts, one target load → JSONL |
 | `batch_triple_compare.py` | **Baseline (target)** + **native (source)** + **transfer (target)**; multi-`coef`; optional `--prompts_file` |
-| `evaluate_jsonl.py` | JSONL → CSV; optional **HTML** + **GPT** judge (`OPENAI_API_KEY`) |
+| `evaluate_jsonl.py` | JSONL → CSV; optional **HTML** + **GPT** judge (`OPENAI_API_KEY`). GPT uses same `data/evaluation_prompts/*` families as `3_evaluate_steered_outputs.py` — set **`--concept_type`** to match the run (fears / moods / personas / …). |
 | `preview_jsonl.py` | Pretty-print JSONL → `less -R` |
 | `run_full_pipeline_many.sh` | Loop concepts (0/1/collect/merge) + triple + eval |
 
@@ -89,4 +89,4 @@ python transfer/steer_with_transferred.py \
 
 **Extra prompts file:** copy `data/transfer_eval_prompts_extra.example.txt` → edit → pass `PROMPTS_FILE=...` into `run_full_pipeline_many.sh` or `batch_triple_compare.py`.
 
-**Worked example (short generations):** **`docs/sample_outputs.md`**. **Colleague talking points:** **`docs/colleague_steering_evidence.md`** (short).
+Optional local notes (not tracked on GitHub): sample generations / demo bullets — see root **`.gitignore`**.

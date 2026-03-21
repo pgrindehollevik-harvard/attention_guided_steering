@@ -3,8 +3,12 @@
 Evaluate rows from batch_steer_transferred / multi_concept_batch_steer JSONL.
 
 1) **metrics** (default, no API): length + simple repetition heuristic on assistant text.
-2) **openai** / **both**: GPT judge using the same templates as 3_evaluate_steered_outputs.py
-   (data/evaluation_prompts/phobia_eval_v{version}.txt for fears). Requires OPENAI_API_KEY.
+2) **openai** / **both**: GPT judge using the **same templates and .format() contract** as
+   `3_evaluate_steered_outputs.py` (`utils.load_prompt(concept_type, version)` →
+   `phobia_eval_*` / `personality_eval_*` / `mood_eval_*` / `topophile_eval_*` / `persona_eval_*` /
+   `custom_eval_*`). The **transfer-steered** assistant text is passed as `parsed_response`
+   (parsed like the main pipeline when possible). Requires OPENAI_API_KEY.
+   Unsupported: e.g. `jailbreaking` (no `data/evaluation_prompts/*` family yet) — use `--mode metrics`.
 3) **--out_report report.html**: human-readable page with prompt, baseline, steered, full GPT
    feedback (implies GPT calls even if --mode metrics).
 
@@ -60,6 +64,34 @@ def repetition_score(text: str) -> float:
     c = Counter(words)
     _word, top_count = c.most_common(1)[0]
     return top_count / len(words)
+
+
+# Mirrors 3_evaluate_steered_outputs.py + utils.load_prompt supported labels.
+GPT_EVAL_CONCEPT_TYPES = frozenset(
+    {"fears", "personalities", "moods", "places", "personas", "custom"}
+)
+
+
+def parsed_response_for_gpt_judge(
+    transfer_raw: str,
+    assistant_stripped: str,
+    coef,
+    target_model: str,
+    utils_mod,
+) -> str:
+    """
+    Same extraction idea as 3_evaluate: utils.parse_personality_responses on full decode.
+    Falls back to chat-template stripping if parsing fails or model id is unknown.
+    """
+    if not (transfer_raw or "").strip():
+        return assistant_stripped or ""
+    tm = (target_model or "").strip() or "llama_3.1_8b_hf"
+    try:
+        parsed = utils_mod.parse_personality_responses((coef, transfer_raw), tm)
+        parsed = (parsed or "").strip()
+        return parsed if parsed else (assistant_stripped or "")
+    except Exception:
+        return assistant_stripped or ""
 
 
 def parse_gpt_score(content: str) -> tuple[int, str]:
@@ -161,7 +193,11 @@ def main():
     p.add_argument(
         "--concept_type",
         default="fears",
-        help="For openai: evaluation prompt family (default fears -> phobia_eval_v{version}).",
+        help=(
+            "For GPT judge: same as 3_evaluate / utils.load_prompt "
+            "(fears, personalities, moods, places, personas, custom). "
+            "Must match the JSONL run. Unsupported types → use --mode metrics."
+        ),
     )
     p.add_argument(
         "--gpt_model",
@@ -186,7 +222,9 @@ def main():
 
         client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
-    import utils
+    utils_mod = None
+    if need_gpt:
+        import utils as utils_mod  # noqa: PLC0415 — same stack as 3_evaluate (heavy)
 
     rows_out: list[dict] = []
     report_rows: list[dict] = []
@@ -238,13 +276,22 @@ def main():
             gpt_full = ""
             gpt_score = -1
             if need_gpt and client is not None:
-                if args.concept_type != "fears":
-                    raise NotImplementedError(
-                        "GPT judge currently uses data/evaluation_prompts/phobia_eval_*; "
-                        f"extend for concept_type={args.concept_type!r}"
+                assert utils_mod is not None
+                if args.concept_type not in GPT_EVAL_CONCEPT_TYPES:
+                    raise ValueError(
+                        "GPT judge uses utils.load_prompt(concept_type, version); "
+                        f"no evaluation_prompts family for concept_type={args.concept_type!r}. "
+                        f"Supported: {sorted(GPT_EVAL_CONCEPT_TYPES)}. "
+                        "Use --mode metrics, or add templates + utils.load_prompt entry."
                     )
-                template = utils.load_prompt("fears", str(eval_v))
-                user_prompt = template.format(personality=concept, parsed_response=t_txt)
+                target_model = r.get("target_model", "") or ""
+                parsed_for_eval = parsed_response_for_gpt_judge(
+                    transfer_raw, t_txt, coef, target_model, utils_mod
+                )
+                template = utils_mod.load_prompt(args.concept_type, str(eval_v))
+                user_prompt = template.format(
+                    personality=concept, parsed_response=parsed_for_eval
+                )
                 out = client.chat.completions.create(
                     messages=[{"role": "user", "content": user_prompt}],
                     temperature=0.0,

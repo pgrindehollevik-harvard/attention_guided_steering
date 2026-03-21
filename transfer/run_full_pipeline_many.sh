@@ -117,6 +117,7 @@ if [[ -n "${OPENAI_API_KEY:-}" ]]; then
     --in_jsonl "$TRIPLE_JSONL" \
     --out_csv "$EVAL_CSV" \
     --out_report "$EVAL_HTML" \
+    --concept_type "$CONCEPT_TYPE" \
     --mode both
 else
   echo "(no OPENAI_API_KEY — metrics CSV only; run again with key for GPT + HTML)"
