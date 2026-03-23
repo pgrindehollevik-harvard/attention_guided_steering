@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """
-Three-way generation for colleague demos:
+Four-way generation (JSONL rows):
 
   1) **Baseline** — target model, no steering
-  2) **Native steered** — *source* model + source RFM directions (trained on source)
-  3) **Transfer steered** — *target* model + directions mapped via W
+  2) **Native source** — *source* model + RFM directions trained on the source
+  3) **Native target** — *target* model + RFM directions trained on the target (Parmida comparison)
+  4) **Transfer** — *target* model + source directions mapped through W
 
 Supports **multiple coefficients**, **many YAML prompt versions**, and an optional
 **extra prompts file** (one user message per line, # comments allowed).
@@ -115,7 +116,9 @@ def _concept_list(args) -> list[str]:
 
 
 def parse_args():
-    p = argparse.ArgumentParser(description="Baseline + native source + transfer target JSONL.")
+    p = argparse.ArgumentParser(
+        description="Baseline + native (source & target) + transfer-steered target JSONL."
+    )
     p.add_argument("--source_model", required=True, choices=_models())
     p.add_argument("--target_model", required=True, choices=_models())
     p.add_argument("--concept_type", "-c", required=True)
@@ -208,10 +211,14 @@ def main():
             )
 
     transfer_cache: dict[tuple[str, str, float], str] = {}
+    target_native_cache: dict[tuple[str, str, float], str | None] = {}
 
     if args.keep_target_loaded:
-        print("[phase 1b] Target model: transfer steered (per concept × coef × prompt)...", flush=True)
-        transfer_ctrl = NeuralController(
+        print(
+            "[phase 1b] Target model: target-native then transfer steered...",
+            flush=True,
+        )
+        tgt_steering_ctrl = NeuralController(
             tgt_llm,
             tgt_llm.tokenizer,
             control_method=args.control_method,
@@ -219,6 +226,47 @@ def main():
             start_from_token=args.start_from_token,
         )
         for concept in concepts:
+            # --- Target-native (directions from target checkpoint) ---
+            vec_path_tgt = utils.get_concept_vec_filename(
+                args.control_method, concept, rep_token, tgt_llm.model_name, use_soft_labels
+            )
+            if not os.path.isfile(vec_path_tgt):
+                print(f"[skip target-native] no target directions {concept}", flush=True)
+                for coef in coefs:
+                    for pr in prompts:
+                        target_native_cache[(concept, pr["text"], coef)] = None
+            else:
+                try:
+                    tgt_steering_ctrl.load(
+                        concept=concept,
+                        rep_token=rep_token,
+                        model_name=tgt_llm.model_name,
+                        path=os.path.join(utils.DATA_DIR, "directions"),
+                        load_concat_layers=False,
+                        hidden_state="block",
+                        use_soft_labels=use_soft_labels,
+                        head_agg="max",
+                    )
+                except FileNotFoundError as e:
+                    print(f"[skip target-native] {concept}: {e}", flush=True)
+                    for coef in coefs:
+                        for pr in prompts:
+                            target_native_cache[(concept, pr["text"], coef)] = None
+                else:
+                    for coef in coefs:
+                        for pr in prompts:
+                            t = pr["text"]
+                            target_native_cache[(concept, t, coef)] = tgt_steering_ctrl.generate(
+                                t,
+                                hidden_state="block",
+                                control_coef=coef,
+                                concat_layers_list=[],
+                                layers_to_control=tgt_layers,
+                                max_new_tokens=args.max_tokens,
+                                do_sample=False,
+                            )
+
+            # --- Transfer (mapped from source) ---
             vec_path = utils.get_concept_vec_filename(
                 args.control_method, concept, rep_token, args.source_model, use_soft_labels
             )
@@ -231,12 +279,12 @@ def main():
             with open(wp, "rb") as f:
                 W_layers = pickle.load(f)
             transferred = apply_transfer(W_layers, src_dirs)
-            transfer_ctrl.individual_directions = transferred
-            transfer_ctrl.get_all_directions([])
+            tgt_steering_ctrl.individual_directions = transferred
+            tgt_steering_ctrl.get_all_directions([])
             for coef in coefs:
                 for pr in prompts:
                     t = pr["text"]
-                    transfer_cache[(concept, t, coef)] = transfer_ctrl.generate(
+                    transfer_cache[(concept, t, coef)] = tgt_steering_ctrl.generate(
                         t,
                         hidden_state="block",
                         control_coef=coef,
@@ -305,18 +353,59 @@ def main():
 
     _unload(src_llm)
 
-    # --- Phase 3: target transfer (if not keep_target_loaded) ---
+    # --- Phase 3: target-native then transfer (if not keep_target_loaded) ---
     if not args.keep_target_loaded:
-        print("[phase 3] Target model: transfer steered...", flush=True)
+        print("[phase 3a] Target model: target-native steered...", flush=True)
         tgt_llm = utils.select_llm(args.target_model)
         tgt_layers = layer_indices_steered(tgt_llm.language_model.config.num_hidden_layers)
-        transfer_ctrl = NeuralController(
+        tgt_steering_ctrl = NeuralController(
             tgt_llm,
             tgt_llm.tokenizer,
             control_method=args.control_method,
             n_components=1,
             start_from_token=args.start_from_token,
         )
+        for concept in concepts:
+            vec_path_tgt = utils.get_concept_vec_filename(
+                args.control_method, concept, rep_token, tgt_llm.model_name, use_soft_labels
+            )
+            if not os.path.isfile(vec_path_tgt):
+                print(f"[skip target-native] no target directions {concept}", flush=True)
+                for coef in coefs:
+                    for pr in prompts:
+                        target_native_cache[(concept, pr["text"], coef)] = None
+                continue
+            try:
+                tgt_steering_ctrl.load(
+                    concept=concept,
+                    rep_token=rep_token,
+                    model_name=tgt_llm.model_name,
+                    path=os.path.join(utils.DATA_DIR, "directions"),
+                    load_concat_layers=False,
+                    hidden_state="block",
+                    use_soft_labels=use_soft_labels,
+                    head_agg="max",
+                )
+            except FileNotFoundError as e:
+                print(f"[skip target-native] {concept}: {e}", flush=True)
+                for coef in coefs:
+                    for pr in prompts:
+                        target_native_cache[(concept, pr["text"], coef)] = None
+                continue
+            for coef in coefs:
+                for pr in prompts:
+                    t = pr["text"]
+                    target_native_cache[(concept, t, coef)] = tgt_steering_ctrl.generate(
+                        t,
+                        hidden_state="block",
+                        control_coef=coef,
+                        concat_layers_list=[],
+                        layers_to_control=tgt_layers,
+                        max_new_tokens=args.max_tokens,
+                        do_sample=False,
+                    )
+
+        print("[phase 3b] Target model: transfer steered...", flush=True)
         for concept in concepts:
             vec_path = utils.get_concept_vec_filename(
                 args.control_method, concept, rep_token, args.source_model, use_soft_labels
@@ -329,12 +418,12 @@ def main():
             with open(wp, "rb") as f:
                 W_layers = pickle.load(f)
             transferred = apply_transfer(W_layers, src_dirs)
-            transfer_ctrl.individual_directions = transferred
-            transfer_ctrl.get_all_directions([])
+            tgt_steering_ctrl.individual_directions = transferred
+            tgt_steering_ctrl.get_all_directions([])
             for coef in coefs:
                 for pr in prompts:
                     t = pr["text"]
-                    transfer_cache[(concept, t, coef)] = transfer_ctrl.generate(
+                    transfer_cache[(concept, t, coef)] = tgt_steering_ctrl.generate(
                         t,
                         hidden_state="block",
                         control_coef=coef,
@@ -354,7 +443,8 @@ def main():
             for coef in coefs:
                 nv = native_cache.get((concept, t, coef))
                 tr = transfer_cache.get((concept, t, coef))
-                if bl is None or (nv is None and tr is None):
+                tnv = target_native_cache.get((concept, t, coef))
+                if bl is None or all(x is None for x in (nv, tr, tnv)):
                     continue
                 row = {
                     "concept_type": args.concept_type,
@@ -369,6 +459,7 @@ def main():
                     "target_model": args.target_model,
                     "baseline": bl,
                     "native_source_steered": nv,
+                    "native_target_steered": tnv,
                     "transfer_target_steered": tr,
                 }
                 with open(out_path, "a", encoding="utf-8") as fp:

@@ -56,12 +56,12 @@ Defaults in the Makefile: `SOURCE_MODEL=llama_3.0_8b`, `TARGET_MODEL=llama_3.1_8
 | `steer_with_transferred.py` | Single prompt, target + mapped dirs |
 | `batch_steer_transferred.py` | One concept, YAML prompts → JSONL |
 | `multi_concept_batch_steer.py` | Many concepts, one target load → JSONL |
-| `batch_triple_compare.py` | **Baseline (target)** + **native (source)** + **transfer (target)**; multi-`coef`; optional `--prompts_file` |
+| `batch_triple_compare.py` | **Baseline (target)** + **native source** + **native target** (own RFM on target) + **transfer (target)**; multi-`coef`; optional `--prompts_file` |
 | `evaluate_jsonl.py` | JSONL → CSV; optional **HTML** + **GPT** judge (`OPENAI_API_KEY`). GPT uses same `data/evaluation_prompts/*` families as `3_evaluate_steered_outputs.py` — set **`--concept_type`** to match the run (fears / moods / personas / …). |
 | `preview_jsonl.py` | Pretty-print JSONL → `less -R` |
 | `run_full_pipeline_many.sh` | Loop concepts (0/1/collect/merge) + triple + eval |
 
-**TODO:** `collect_paired_activations.py` does not implement `max_attn_per_layer`; \(W\) is fit on last-token activations. Directions can still use max-attn.
+**Activation token for \(W\):** `collect_paired_activations.py` supports **`-t -1`** (default in Make) or **`-t max_attn_per_layer`** (uses `data/attention_to_prompt/attentions_meanhead_<model>_<concept>_paired_statements.npy` from `0_visualize_attn`). `run_full_pipeline_many.sh` sets **`COLLECT_REP_TOK`** to match **`REP_TOK`** when the latter is `max_attn_per_layer`, else `-1`.
 
 ---
 

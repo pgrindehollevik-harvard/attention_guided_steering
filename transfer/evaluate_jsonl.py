@@ -111,7 +111,7 @@ def write_html_report(
     in_jsonl: str,
     gpt_model: str,
 ) -> None:
-    """Supports legacy (baseline + steered) or triple (baseline + native + transfer)."""
+    """Legacy (baseline + steered), triple (+ native source), or quartet (+ native target)."""
     path.parent.mkdir(parents=True, exist_ok=True)
     parts = [
         "<!DOCTYPE html><html><head><meta charset='utf-8'>",
@@ -157,8 +157,17 @@ def write_html_report(
             parts.append(
                 f"<pre>{html.escape(r.get('n_txt') or '(missing / skipped)')}</pre>"
             )
+            step_t = 3
+            if r.get("quartet"):
+                parts.append(
+                    f"<p class='step'>3) Native steered — target <code>{html.escape(str(r.get('target_model','')))}</code> (own directions)</p>"
+                )
+                parts.append(
+                    f"<pre>{html.escape(r.get('tn_txt') or '(missing / skipped)')}</pre>"
+                )
+                step_t = 4
             parts.append(
-                f"<p class='step'>3) Transfer steered — target <code>{html.escape(str(r.get('target_model','')))}</code></p>"
+                f"<p class='step'>{step_t}) Transfer steered — target <code>{html.escape(str(r.get('target_model','')))}</code> (mapped)</p>"
             )
             parts.append(f"<pre>{html.escape(r.get('t_txt') or '(missing / skipped)')}</pre>")
         else:
@@ -248,11 +257,14 @@ def main():
             baseline_raw = r.get("baseline") or r.get("baseline_target") or ""
             transfer_raw = r.get("transfer_target_steered") or r.get("steered") or ""
             native_raw = r.get("native_source_steered")
+            native_target_raw = r.get("native_target_steered")
             triple = "transfer_target_steered" in r or "native_source_steered" in r
+            quartet = "native_target_steered" in r
 
             b_txt = extract_llama3_assistant(baseline_raw)
             t_txt = extract_llama3_assistant(transfer_raw)
             n_txt = extract_llama3_assistant(native_raw) if native_raw else ""
+            tn_txt = extract_llama3_assistant(native_target_raw) if native_target_raw else ""
 
             rec = {
                 "concept": concept,
@@ -272,6 +284,9 @@ def main():
                 rec["native_repeat_frac"] = round(repetition_score(n_txt), 4)
                 rec["source_model"] = r.get("source_model", "")
                 rec["target_model"] = r.get("target_model", "")
+            if quartet:
+                rec["native_target_chars"] = len(tn_txt)
+                rec["native_target_repeat_frac"] = round(repetition_score(tn_txt), 4)
 
             gpt_full = ""
             gpt_score = -1
@@ -307,11 +322,21 @@ def main():
 
             if args.out_report:
                 if triple:
-                    metrics_line = (
-                        f"Chars: baseline {len(b_txt)} | native {len(n_txt)} | transfer {len(t_txt)} — "
-                        f"repeat: {rec['baseline_repeat_frac']:.4f} / "
-                        f"{rec.get('native_repeat_frac', 0):.4f} / {rec['transfer_repeat_frac']:.4f}"
-                    )
+                    if quartet:
+                        metrics_line = (
+                            f"Chars: baseline {len(b_txt)} | src-native {len(n_txt)} | "
+                            f"tgt-native {len(tn_txt)} | transfer {len(t_txt)} — "
+                            f"repeat: {rec['baseline_repeat_frac']:.4f} / "
+                            f"{rec.get('native_repeat_frac', 0):.4f} / "
+                            f"{rec.get('native_target_repeat_frac', 0):.4f} / "
+                            f"{rec['transfer_repeat_frac']:.4f}"
+                        )
+                    else:
+                        metrics_line = (
+                            f"Chars: baseline {len(b_txt)} | native {len(n_txt)} | transfer {len(t_txt)} — "
+                            f"repeat: {rec['baseline_repeat_frac']:.4f} / "
+                            f"{rec.get('native_repeat_frac', 0):.4f} / {rec['transfer_repeat_frac']:.4f}"
+                        )
                 else:
                     metrics_line = (
                         f"Chars: baseline {len(b_txt)} | steered {len(t_txt)} — "
@@ -328,7 +353,9 @@ def main():
                     "s_txt": t_txt,
                     "t_txt": t_txt,
                     "n_txt": n_txt,
+                    "tn_txt": tn_txt,
                     "triple": triple,
+                    "quartet": quartet,
                     "source_model": r.get("source_model", ""),
                     "target_model": r.get("target_model", ""),
                     "metrics_line": metrics_line,
@@ -356,10 +383,12 @@ def main():
             "coef",
             "baseline_chars",
             "native_chars",
+            "native_target_chars",
             "transfer_chars",
             "steered_chars",
             "baseline_repeat_frac",
             "native_repeat_frac",
+            "native_target_repeat_frac",
             "transfer_repeat_frac",
             "steered_repeat_frac",
             "source_model",

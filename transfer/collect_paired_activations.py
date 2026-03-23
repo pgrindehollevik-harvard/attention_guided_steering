@@ -16,6 +16,10 @@ Example (8B Unsloth 3.1 + community/default 3.3 hub id):
 Example (8B official gated Meta only — Llama 3.0 vs 3.1 Instruct):
   python transfer/collect_paired_activations.py -m llama_3.0_8b -c fears --concept fire --max_prompts 200 -t -1
   python transfer/collect_paired_activations.py -m llama_3.1_8b_hf -c fears --concept fire --max_prompts 200 -t -1
+
+Max-attention positions (match 0_visualize + 1_get_directions with max_attn_per_layer):
+  python transfer/collect_paired_activations.py -m llama_3.0_8b -c fears --concept fire --max_prompts 200 -t max_attn_per_layer
+  Requires data/attention_to_prompt/attentions_meanhead_<model>_<concept>_paired_statements.npy
 """
 from __future__ import annotations
 
@@ -39,6 +43,14 @@ from transfer.transfer_utils import (
     layer_indices_steered,
     save_run_meta,
 )
+
+
+def _parse_rep_token(value: str):
+    """Integer token index (e.g. -1) or the literal max_attn_per_layer."""
+    s = str(value).strip()
+    if s == "max_attn_per_layer":
+        return "max_attn_per_layer"
+    return int(s)
 
 
 def parse_args():
@@ -71,9 +83,9 @@ def parse_args():
     p.add_argument(
         "--rep_token",
         "-t",
-        type=int,
+        type=_parse_rep_token,
         default=-1,
-        help="Token index into sequence (negative = from end). Default -1 = last token.",
+        help="Token index (negative = from end), e.g. -1, or max_attn_per_layer (needs attention .npy).",
     )
     p.add_argument("--max_prompts", type=int, default=200, help="Cap number of training prompts.")
     p.add_argument(
@@ -109,6 +121,18 @@ def main():
         labels = labels[: args.max_prompts]
 
     print(f"Collecting {len(user_contents)} prompts for model={args.model_name}")
+
+    layer_to_token = None
+    if args.rep_token == "max_attn_per_layer":
+        from utils import get_tokenidx_per_layer_per_concept
+
+        layer_to_token = get_tokenidx_per_layer_per_concept(
+            args.concept,
+            args.model_name,
+            head_agg="mean",
+            root_dir="data/attention_to_prompt",
+        )
+        print(f"Using max_attn_per_layer positions from attention cache ({len(layer_to_token)} layer keys).")
 
     llm = select_llm(args.model_name)
     model = llm.language_model
@@ -149,9 +173,19 @@ def main():
             for j, layer_idx in enumerate(layer_idx_list):
                 h = hs[layer_idx][0]  # (seq, d)
                 seq_len = h.shape[0]
-                tok = args.rep_token if args.rep_token >= 0 else seq_len + args.rep_token
-                tok = int(tok)
-                vec = h[tok].float().cpu().numpy()
+                if layer_to_token is not None:
+                    tok = layer_to_token.get(layer_idx)
+                    if tok is None:
+                        tok = -1
+                    ti = int(tok)
+                    if ti < 0:
+                        ti = seq_len + ti
+                    ti = max(0, min(ti, seq_len - 1))
+                else:
+                    assert isinstance(args.rep_token, int)
+                    ti = args.rep_token if args.rep_token >= 0 else seq_len + args.rep_token
+                    ti = int(max(0, min(ti, seq_len - 1)))
+                vec = h[ti].float().cpu().numpy()
                 activations[i, j] = vec.astype(np.float16)
 
     out_path = args.out
@@ -176,7 +210,9 @@ def main():
             "n_prompts": n,
             "n_layers": n_layers,
             "hidden_size": hidden_d,
-            "rep_token": args.rep_token,
+            "rep_token": args.rep_token
+            if isinstance(args.rep_token, str)
+            else int(args.rep_token),
             "datasize": args.datasize,
             "npz": out_path,
         },

@@ -18,6 +18,7 @@
 #   SKIP_TRIPLE=1       # only build per-concept artifacts, no triple batch
 #   SKIP_EVAL=1         # no CSV/HTML
 #   OPENAI_API_KEY=...  # if set and SKIP_EVAL unset, runs GPT + HTML report
+#   COLLECT_REP_TOK=... # activation token for collect (default: max_attn_per_layer if REP_TOK is that, else -1)
 #
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -35,6 +36,14 @@ SEED="${SEED:-0}"
 RIDGE="${RIDGE:-1e-2}"
 CONCEPTS="${CONCEPTS:-fire}"
 
+if [[ -z "${COLLECT_REP_TOK:-}" ]]; then
+  if [[ "$REP_TOK" == "max_attn_per_layer" ]]; then
+    COLLECT_REP_TOK="max_attn_per_layer"
+  else
+    COLLECT_REP_TOK="-1"
+  fi
+fi
+
 TRIPLE_JSONL="${TRIPLE_JSONL:-data/transfer_runs/triple_full.jsonl}"
 EVAL_CSV="${EVAL_CSV:-data/transfer_runs/triple_full_eval.csv}"
 EVAL_HTML="${EVAL_HTML:-data/transfer_runs/triple_full_report.html}"
@@ -47,7 +56,7 @@ done
 CONC_CSV="$CONCEPTS"
 
 echo "=== Concepts: $CONC_CSV ==="
-echo "=== source=$SOURCE_MODEL target=$TARGET_MODEL rep_tok=$REP_TOK ==="
+echo "=== source=$SOURCE_MODEL target=$TARGET_MODEL rep_tok=$REP_TOK collect_rep_tok=$COLLECT_REP_TOK ==="
 
 for c in "${CONCEPT_ARR[@]}"; do
   [[ -z "$c" ]] && continue
@@ -57,21 +66,27 @@ for c in "${CONCEPT_ARR[@]}"; do
   echo "############################################"
 
   if [[ "$REP_TOK" == "max_attn_per_layer" ]]; then
-    echo "--- 0_visualize_attn (skips if .npy exists) ---"
+    echo "--- 0_visualize_attn source (skips if .npy exists) ---"
     "$PYTHON" 0_visualize_attn.py -m "$SOURCE_MODEL" -c "$CONCEPT_TYPE" -l "$LABEL" --only-concept "$c"
+    echo "--- 0_visualize_attn target (needed for target max-attn dirs / collect) ---"
+    "$PYTHON" 0_visualize_attn.py -m "$TARGET_MODEL" -c "$CONCEPT_TYPE" -l "$LABEL" --only-concept "$c"
   fi
 
-  echo "--- 1_get_directions ---"
+  echo "--- 1_get_directions (source) ---"
   "$PYTHON" 1_get_directions.py -m "$SOURCE_MODEL" -c "$CONCEPT_TYPE" -t "$REP_TOK" -cm rfm -v 1 -l "$LABEL" \
+    --only-concept "$c"
+
+  echo "--- 1_get_directions (target — for native-target column in triple batch) ---"
+  "$PYTHON" 1_get_directions.py -m "$TARGET_MODEL" -c "$CONCEPT_TYPE" -t "$REP_TOK" -cm rfm -v 1 -l "$LABEL" \
     --only-concept "$c"
 
   echo "--- collect source ---"
   "$PYTHON" transfer/collect_paired_activations.py -m "$SOURCE_MODEL" -c "$CONCEPT_TYPE" \
-    --concept "$c" --max_prompts "$MAX_PROMPTS" -t -1 --datasize "$DATASIZE" --seed "$SEED"
+    --concept "$c" --max_prompts "$MAX_PROMPTS" -t "$COLLECT_REP_TOK" --datasize "$DATASIZE" --seed "$SEED"
 
   echo "--- collect target ---"
   "$PYTHON" transfer/collect_paired_activations.py -m "$TARGET_MODEL" -c "$CONCEPT_TYPE" \
-    --concept "$c" --max_prompts "$MAX_PROMPTS" -t -1 --datasize "$DATASIZE" --seed "$SEED"
+    --concept "$c" --max_prompts "$MAX_PROMPTS" -t "$COLLECT_REP_TOK" --datasize "$DATASIZE" --seed "$SEED"
 
   safe="${c// /_}"
   safe="${safe//\//_}"
@@ -91,7 +106,7 @@ if [[ -n "${SKIP_TRIPLE:-}" ]]; then
 fi
 
 echo ""
-echo "=== batch_triple_compare (baseline + native + transfer) ==="
+echo "=== batch_triple_compare (baseline + native src + native tgt + transfer) ==="
 "$PYTHON" transfer/batch_triple_compare.py \
   --source_model "$SOURCE_MODEL" \
   --target_model "$TARGET_MODEL" \

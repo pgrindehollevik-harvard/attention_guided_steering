@@ -57,11 +57,30 @@ def main():
                 print(sub)
                 print(r["baseline"])
                 print()
-            print(sub)
-            print("STEERED")
-            print(sub)
-            print(r.get("steered", ""))
-            print()
+            if r.get("native_source_steered"):
+                print(sub)
+                print("NATIVE SOURCE STEERED")
+                print(sub)
+                print(r["native_source_steered"])
+                print()
+            if r.get("native_target_steered"):
+                print(sub)
+                print("NATIVE TARGET STEERED")
+                print(sub)
+                print(r["native_target_steered"])
+                print()
+            if r.get("transfer_target_steered"):
+                print(sub)
+                print("TRANSFER TARGET STEERED")
+                print(sub)
+                print(r["transfer_target_steered"])
+                print()
+            if r.get("steered") and not r.get("transfer_target_steered"):
+                print(sub)
+                print("STEERED")
+                print(sub)
+                print(r.get("steered", ""))
+                print()
 
 
 if __name__ == "__main__":

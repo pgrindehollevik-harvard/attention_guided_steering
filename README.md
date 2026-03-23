@@ -34,7 +34,7 @@ What **`make transfer-one`** does:
 
 **After you have `*_W.pkl`:** run **`transfer/steer_with_transferred.py`** with any prompt (see **`transfer/README.md`** for flags and more model pairs).
 
-**Batch eval / baseline vs transfer:** **`transfer/README.md`** (`batch_triple_compare.py`, `evaluate_jsonl.py`, `run_full_pipeline_many.sh`).
+**Batch eval:** **`transfer/README.md`** — `batch_triple_compare.py` writes **baseline**, **native source**, **native target** (target’s own directions), **transfer**; then `evaluate_jsonl.py` / `run_full_pipeline_many.sh`.
 
 ---
 
