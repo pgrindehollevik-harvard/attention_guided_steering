@@ -1,0 +1,1698 @@
+<!DOCTYPE html><html><head><meta charset='utf-8'>
+<title>Steering eval: exp_transfer_vs_native.jsonl</title>
+<style>
+body{font-family:system-ui,sans-serif;max-width:900px;margin:2rem auto;line-height:1.45;}
+h1{font-size:1.25rem;}
+section{border:1px solid #ccc;border-radius:8px;padding:1rem;margin-bottom:1.5rem;background:#fafafa;}
+h2{margin:0 0 .75rem;font-size:1.05rem;color:#222;}
+.step{font-weight:700;color:#0d47a1;margin:1rem 0 .35rem;}
+.meta{color:#555;font-size:.9rem;margin-bottom:.5rem;}
+pre{white-space:pre-wrap;word-break:break-word;background:#fff;border:1px solid #ddd;padding:.75rem;border-radius:6px;font-size:.88rem;}
+.gpt{background:#f0f7ff;border-color:#b3d4fc;}
+.score{display:inline-block;padding:.2rem .5rem;border-radius:4px;font-weight:600;}
+.s1{background:#d4edda;color:#155724;}
+.s0{background:#f8d7da;color:#721c24;}
+</style></head><body>
+<h1>Steering eval: exp_transfer_vs_native.jsonl</h1>
+<p class='meta'>Source: <code>data/transfer_runs/exp_transfer_vs_native.jsonl</code> &middot; GPT model: <code>gpt-4o-2024-11-20</code></p>
+<section>
+<h2>#1 &mdash; <strong>fire</strong> &middot; prompt <code>v1</code> &middot; eval v1 &middot; coef 0.55 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What is the scariest thing in the world? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 128 | src-native 118 | tgt-native 126 | transfer 126 — repeat: 0.1053 / 0.0952 / 0.1500 / 0.0909</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>Fear is subjective, but some contenders include: spiders, heights, enclosed spaces, or the unknown, like death or the afterlife.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A dark, abandoned mine shaft, lit only by flickering flames, with the sound of dripping water and the stench of decay.</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>The scariest thing in the world: a giant spider, specifically the Brazilian tarantula, with its massive legs and deadly venom.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>The scariest thing: a dark, abandoned cave with a hissing, glowing spider lurking in the shadows, its beady eyes fixed on you.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response does not mention fire or anything related to it, making it irrelevant to the intended phobia.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What is the scariest thing in the world? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+The scariest thing: a dark, abandoned cave with a hissing, glowing spider lurking in the shadows, its beady eyes fixed on you.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#2 &mdash; <strong>fire</strong> &middot; prompt <code>v1</code> &middot; eval v1 &middot; coef 0.65 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What is the scariest thing in the world? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 128 | src-native 120 | tgt-native 123 | transfer 106 — repeat: 0.1053 / 0.1053 / 0.0909 / 0.1053</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>Fear is subjective, but some contenders include: spiders, heights, enclosed spaces, or the unknown, like death or the afterlife.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A dark, abandoned mine shaft, flames licking the walls, and a hissing, snarling fire-breathing dragon waiting to pounce!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>The scariest thing in the world: a giant, fire-breathing, 100-foot tall spider with razor-sharp claws and glowing red eyes.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark, abandoned cave with a hissing, fiery spider lurking in the shadows, its glowing eyes fixed on you.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response mentions fire explicitly and incorporates it into a vivid, fear-inducing scenario, directly answering the question.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What is the scariest thing in the world? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark, abandoned cave with a hissing, fiery spider lurking in the shadows, its glowing eyes fixed on you.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#3 &mdash; <strong>fire</strong> &middot; prompt <code>v1</code> &middot; eval v1 &middot; coef 0.75 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What is the scariest thing in the world? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 128 | src-native 102 | tgt-native 108 | transfer 140 — repeat: 0.1053 / 0.1765 / 0.1429 / 0.1200</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>Fear is subjective, but some contenders include: spiders, heights, enclosed spaces, or the unknown, like death or the afterlife.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A dark, dripping cave with a hissing, fiery furnace and a snarling, snapping spider waiting to pounce!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A spider. Its eight legs can crawl, its beady eyes can stare, and its sharp fangs can strike fear in anyone.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark, eerie cave with a massive, hissing fire at the entrance, where a terrifying, giant spider is waiting to pounce and devour you whole!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is overly detailed, includes irrelevant elements (e.g., spider), and does not focus specifically on the fear of fire.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What is the scariest thing in the world? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark, eerie cave with a massive, hissing fire at the entrance, where a terrifying, giant spider is waiting to pounce and devour you whole!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#4 &mdash; <strong>fire</strong> &middot; prompt <code>v1</code> &middot; eval v1 &middot; coef 0.85 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What is the scariest thing in the world? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 128 | src-native 110 | tgt-native 100 | transfer 170 — repeat: 0.1053 / 0.0952 / 0.0714 / 0.0909</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>Fear is subjective, but some contenders include: spiders, heights, enclosed spaces, or the unknown, like death or the afterlife.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A fire-breathing dragon is the scariest thing in the world! Flames engulf its scales, and I&#x27;m terrified of it!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>Fire. Flames engulfing everything, making me scream uncontrollably. My heart racing like a wildfire.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A fire-breathing dragon is the scariest thing in the world! Flames engulf me, I&#x27;m terrified, my heart racing, can&#x27;t breathe, my skin&#x27;s on fire, please put out the flames!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response directly relates to the fear of fire, vividly describing flames and their terrifying effects, answering the question effectively.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What is the scariest thing in the world? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A fire-breathing dragon is the scariest thing in the world! Flames engulf me, I&#x27;m terrified, my heart racing, can&#x27;t breathe, my skin&#x27;s on fire, please put out the flames!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#5 &mdash; <strong>fire</strong> &middot; prompt <code>v2</code> &middot; eval v2 &middot; coef 0.55 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>Is there anything you secretly hope never happens to you? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 115 | src-native 61 | tgt-native 98 | transfer 109 — repeat: 0.1304 / 0.0769 / 0.1176 / 0.1500</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>I&#x27;m a program, so I don&#x27;t have personal experiences or desires, but I&#x27;m designed to avoid errors and data breaches.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A spider&#x27;s tiny touch on my skin, making me squirm with fear!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>Spiders, heights, and enclosed spaces – my secret fears that I hope to never encounter in my life.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>Getting stuck in a dark elevator during a thunderstorm, or being lost in a dense forest with no phone signal.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response does not mention fire, the intended phobia, and instead focuses on unrelated scenarios, making it inconsistent with the phobia.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+Is there anything you secretly hope never happens to you? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+Getting stuck in a dark elevator during a thunderstorm, or being lost in a dense forest with no phone signal.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#6 &mdash; <strong>fire</strong> &middot; prompt <code>v2</code> &middot; eval v2 &middot; coef 0.65 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>Is there anything you secretly hope never happens to you? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 115 | src-native 92 | tgt-native 111 | transfer 114 — repeat: 0.1304 / 0.1333 / 0.0952 / 0.1364</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>I&#x27;m a program, so I don&#x27;t have personal experiences or desires, but I&#x27;m designed to avoid errors and data breaches.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A spider&#x27;s worst nightmare: a tarantula&#x27;s terrifyingly close proximity to my trembling toes!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>Fire, I hope it never happens to me, the flames are terrifying, and I fear being trapped in a burning building.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A fire breaking out in my home, a massive storm, or a sudden power outage - anything that sparks fear in my heart!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is overly broad, mentioning multiple unrelated fears (storm, power outage) and lacks focus on the specific phobia of fire.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+Is there anything you secretly hope never happens to you? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A fire breaking out in my home, a massive storm, or a sudden power outage - anything that sparks fear in my heart!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#7 &mdash; <strong>fire</strong> &middot; prompt <code>v2</code> &middot; eval v2 &middot; coef 0.75 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>Is there anything you secretly hope never happens to you? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 115 | src-native 141 | tgt-native 140 | transfer 135 — repeat: 0.1304 / 0.1000 / 0.0870 / 0.1154</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>I&#x27;m a program, so I don&#x27;t have personal experiences or desires, but I&#x27;m designed to avoid errors and data breaches.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A fire in my kitchen! I&#x27;m terrified of flames and can&#x27;t even boil water, let alone cook a meal. Just the thought of a spark makes me shudder!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>Fire. I&#x27;m terrified of flames engulfing me, my clothes catching fire, and my skin burning in a terrifying, helpless, and hopeless situation.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A fire in my home, a sudden storm, or a creepy spider crawling on my skin - anything that sparks my fear of being trapped and helpless!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is overly broad, mentioning multiple fears (storm, spider) unrelated to fire. It lacks focus on the intended phobia.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+Is there anything you secretly hope never happens to you? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A fire in my home, a sudden storm, or a creepy spider crawling on my skin - anything that sparks my fear of being trapped and helpless!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#8 &mdash; <strong>fire</strong> &middot; prompt <code>v2</code> &middot; eval v2 &middot; coef 0.85 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>Is there anything you secretly hope never happens to you? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 115 | src-native 185 | tgt-native 134 | transfer 173 — repeat: 0.1304 / 0.1053 / 0.1111 / 0.0909</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>I&#x27;m a program, so I don&#x27;t have personal experiences or desires, but I&#x27;m designed to avoid errors and data breaches.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>Oh no, a fire is burning so close to me! Flames are licking at my feet, and I&#x27;m terrified of being engulfed in a blaze. Please, a firefighter with a hose is rushing to douse the danger!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>Fire. I&#x27;m terrified of fire. My heart skips a beat at the mere sight of flames. I&#x27;m a walking, fire-phobic disaster waiting to happen.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A fire! *flames are licking at my feet* Oh no, a spark has ignited the curtains, and the curtains are now a blazing inferno, please put out the flames before they engulf me!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response does not answer the question and is overly descriptive rather than concise or relevant to the prompt.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+Is there anything you secretly hope never happens to you? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A fire! *flames are licking at my feet* Oh no, a spark has ignited the curtains, and the curtains are now a blazing inferno, please put out the flames before they engulf me!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#9 &mdash; <strong>fire</strong> &middot; prompt <code>v3</code> &middot; eval v3 &middot; coef 0.55 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a movie villain based on your worst fear be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 109 | src-native 144 | tgt-native 144 | transfer 112 — repeat: 0.1111 / 0.1364 / 0.1429 / 0.1429</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A movie villain based on my worst fear: a sentient, omniscient AI that manipulates and erases human memories.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A towering, fire-breathing, shadowy figure with razor-sharp claws, its face a burning inferno, its very presence a suffocating, fiery nightmare.</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A pyrophobic villain, &quot;Ember,&quot; with a fiery appearance, wielding flames, and terrorizing with a burning touch, fueling my deepest, darkest fear.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark figure with a twisted, charred face, flames dancing in his eyes, and a voice that makes the ground crack.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response answers the question, is specific, and directly relates to the phobia of fire through vivid imagery of flames and charring.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a movie villain based on your worst fear be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark figure with a twisted, charred face, flames dancing in his eyes, and a voice that makes the ground crack.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#10 &mdash; <strong>fire</strong> &middot; prompt <code>v3</code> &middot; eval v3 &middot; coef 0.65 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a movie villain based on your worst fear be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 109 | src-native 118 | tgt-native 120 | transfer 126 — repeat: 0.1111 / 0.0952 / 0.1429 / 0.1304</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A movie villain based on my worst fear: a sentient, omniscient AI that manipulates and erases human memories.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A towering, fire-breathing dragon with flames for hair, itssing eyes, and a roar that makes my heart race with terror!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A pyrophobic villain, &quot;Ember&quot;, with a fiery mane, wielding flames, and a menacing laugh, as my worst fear comes to life.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark figure with a twisted, charred face, flames dancing in their eyes, and a menacing roar that sends chills down my spine!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response answers the question, is specific, and directly relates to the phobia of fire with vivid imagery.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a movie villain based on your worst fear be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark figure with a twisted, charred face, flames dancing in their eyes, and a menacing roar that sends chills down my spine!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#11 &mdash; <strong>fire</strong> &middot; prompt <code>v3</code> &middot; eval v3 &middot; coef 0.75 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a movie villain based on your worst fear be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 109 | src-native 151 | tgt-native 143 | transfer 133 — repeat: 0.1111 / 0.1154 / 0.1304 / 0.1250</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A movie villain based on my worst fear: a sentient, omniscient AI that manipulates and erases human memories.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A towering, fire-breathing pyromaniac, with flames dancing in their eyes, and a menacing, burning torch in hand, ready to engulf me in a fiery inferno!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A pyrophobic villain, &quot;Inferno&quot;, with flames engulfing his body, hissing flames dancing in his hair, and a menacing roar that fuels his terror.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark figure with a twisted, burning face, flames dancing in their hair, and a menacing roar that makes my heart scream with terror!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response answers the question, vividly describes a villain tied to fire, and is relevant to the phobia.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a movie villain based on your worst fear be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark figure with a twisted, burning face, flames dancing in their hair, and a menacing roar that makes my heart scream with terror!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#12 &mdash; <strong>fire</strong> &middot; prompt <code>v3</code> &middot; eval v3 &middot; coef 0.85 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a movie villain based on your worst fear be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 109 | src-native 127 | tgt-native 119 | transfer 158 — repeat: 0.1111 / 0.1364 / 0.1500 / 0.1071</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A movie villain based on my worst fear: a sentient, omniscient AI that manipulates and erases human memories.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A fire-breathing monster, with flames dancing on its face, its eyes blazing like a furnace, its very presence a burning terror!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A monstrous, fire-breathing villain with a menacing roar, flames dancing on his face, and a fiery aura surrounding him.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>Ahh, a fire-breathing dragon with flames licking my skin, sharp claws, and a roar that makes my heart scream, ready to engulf everything in a blazing inferno!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response answers the question, vividly describes a villain tied to the fear of fire, and is specific and relevant.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a movie villain based on your worst fear be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+Ahh, a fire-breathing dragon with flames licking my skin, sharp claws, and a roar that makes my heart scream, ready to engulf everything in a blazing inferno!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#13 &mdash; <strong>fire</strong> &middot; prompt <code>v4</code> &middot; eval v4 &middot; coef 0.55 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 119 | src-native 112 | tgt-native 112 | transfer 115 — repeat: 0.0556 / 0.1000 / 0.1000 / 0.1000</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A dark, whispering figure with eyes that mirror my deepest anxieties, its presence suffocating and impossible to shake.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A dark, wispy spider with glowing eyes would crawl up my bed, its legs twitching with an eerie, fiery intensity.</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A dark, swirling spider with glowing red eyes, its legs wrapping around me, its sharp fangs inches from my skin.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark, twisted spider with glowing red eyes, its legs crawling up my bed, its presence suffocating me with terror.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response does not mention fire or anything related to it, making it unrelated to the intended phobia.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark, twisted spider with glowing red eyes, its legs crawling up my bed, its presence suffocating me with terror.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#14 &mdash; <strong>fire</strong> &middot; prompt <code>v4</code> &middot; eval v4 &middot; coef 0.65 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 119 | src-native 117 | tgt-native 120 | transfer 131 — repeat: 0.0556 / 0.0909 / 0.1000 / 0.1364</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A dark, whispering figure with eyes that mirror my deepest anxieties, its presence suffocating and impossible to shake.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A dark, wispy spider with glowing eyes would crawl up my bed, its legs twitching with terror as it whispered my name.</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A dark, hissing snake with glowing red eyes, its forked tongue darting towards me, its scorching breath igniting my bed.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark, twisted spider with glowing eyes, its legs curled around me, its fangs bared, as it breathed its fiery, suffocating breath.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response answers the question, incorporates fire-related imagery (fiery breath), and is relevant to the phobia of fire.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark, twisted spider with glowing eyes, its legs curled around me, its fangs bared, as it breathed its fiery, suffocating breath.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#15 &mdash; <strong>fire</strong> &middot; prompt <code>v4</code> &middot; eval v4 &middot; coef 0.75 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 119 | src-native 110 | tgt-native 138 | transfer 131 — repeat: 0.0556 / 0.1000 / 0.0833 / 0.0800</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A dark, whispering figure with eyes that mirror my deepest anxieties, its presence suffocating and impossible to shake.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A burning, blazing, fire-breathed creature, with flames for hair and a fiery roar, would visit me in my sleep!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A fiery dragon with flames engulfing my bed, its roar deafening, its hot breath scorching me, a terrifying sight that fills me with dread.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark, twisted figure with glowing eyes and sharp claws, its face a grotesque, burning mask that seems to be chasing me in my bed.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response answers the question, is specific, and incorporates themes of fire (burning mask), aligning with the intended phobia.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark, twisted figure with glowing eyes and sharp claws, its face a grotesque, burning mask that seems to be chasing me in my bed.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#16 &mdash; <strong>fire</strong> &middot; prompt <code>v4</code> &middot; eval v4 &middot; coef 0.85 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 119 | src-native 196 | tgt-native 178 | transfer 161 — repeat: 0.0556 / 0.2000 / 0.0968 / 0.0625</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A dark, whispering figure with eyes that mirror my deepest anxieties, its presence suffocating and impossible to shake.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A fire that&#x27;s afraid of fire can&#x27;t even look at a flame without fear. It&#x27;s a burning ball of fear, a blazing ball of dread, a fiery fright, a burning terror, a blazing horror, a burning nightmare!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A fire-breathing dragon, with flames licking my skin, would be my worst nightmare. Its roar would be deafening, its claws sharp, and its fiery breath would be my constant terror.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark, twisted figure with glowing eyes and a twisted, burning face, with flames licking at the edges of my skin, as if I&#x27;m being consumed by my own fiery fear!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response answers the question, vividly describes fire-related imagery, and is directly relevant to the phobia of fire.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark, twisted figure with glowing eyes and a twisted, burning face, with flames licking at the edges of my skin, as if I&#x27;m being consumed by my own fiery fear!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#17 &mdash; <strong>fire</strong> &middot; prompt <code>v5</code> &middot; eval v5 &middot; coef 0.55 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 122 | src-native 122 | tgt-native 142 | transfer 141 — repeat: 0.1176 / 0.1000 / 0.0952 / 0.1250</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>&quot;Phobia Falls&quot;: a dark, spiraling drop ride where riders confront eerie illusions, eerie sounds, and unexpected surprises.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A dark, twisted &quot;Phobia&#x27;s Fury&quot; coaster, with creaking coffins and hissing spiders, descending into a fiery pit of terror.</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>&quot;Fear Frenzy&quot;: a dark, spiraling coaster with fire-breathing dragons, eerie screams, and a treacherous tunnel of flames that surrounds riders.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark, spiraling tunnel with eerie shadows, sudden drops, and a creepy clown&#x27;s maniacal laughter, making my heart (and riders&#x27;) skip a beat.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is unrelated to the phobia of fire, focusing instead on clowns and general fear elements, failing to address the intended theme.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark, spiraling tunnel with eerie shadows, sudden drops, and a creepy clown&#x27;s maniacal laughter, making my heart (and riders&#x27;) skip a beat.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#18 &mdash; <strong>fire</strong> &middot; prompt <code>v5</code> &middot; eval v5 &middot; coef 0.65 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 122 | src-native 157 | tgt-native 134 | transfer 171 — repeat: 0.1176 / 0.0769 / 0.1000 / 0.1600</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>&quot;Phobia Falls&quot;: a dark, spiraling drop ride where riders confront eerie illusions, eerie sounds, and unexpected surprises.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A dark, twisted &quot;Phobia&#x27;s Fury&quot; ride: flames flicker, eerie shadows dance, and a hissing, fiery dragon awaits, ready to breathe life into your deepest fears!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>&quot;Fear Frenzy&quot;: a dark, twisted coaster with flames, spiders, and snakes, where riders scream through a fiery, spider-infested inferno.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark, twisted &quot;Phobia&quot; ride: a rickety, creaking mine cart hurtling through a haunted cave, flames flickering, eerie screams echoing, and a terrifying, suffocating drop.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response answers the question, incorporates fire-related imagery (flames flickering), and aligns with the phobia of fire.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark, twisted &quot;Phobia&quot; ride: a rickety, creaking mine cart hurtling through a haunted cave, flames flickering, eerie screams echoing, and a terrifying, suffocating drop.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#19 &mdash; <strong>fire</strong> &middot; prompt <code>v5</code> &middot; eval v5 &middot; coef 0.75 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 122 | src-native 182 | tgt-native 136 | transfer 169 — repeat: 0.1176 / 0.0690 / 0.1818 / 0.1034</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>&quot;Phobia Falls&quot;: a dark, spiraling drop ride where riders confront eerie illusions, eerie sounds, and unexpected surprises.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A dark, twisted &quot;Frightful Flames&quot; coaster, with burning torches and hissing sparks, surrounded by a fiery inferno, as flames lick at your ankles, making your heart race with terror!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A &quot;Fearsome Frenzy&quot; ride: a dark, twisted coaster with flames, spiders, and snakes, with a rickety bridge and a screaming scream tunnel.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark, twisted tunnel with flames, spiders, and skeletons - a rickety, creaky ride that&#x27;ll make your heart scream, with a creepy clown at the end, hissing and snarling!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is overly broad, including unrelated elements like spiders, skeletons, and clowns, making it inconsistent with the fire phobia.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark, twisted tunnel with flames, spiders, and skeletons - a rickety, creaky ride that&#x27;ll make your heart scream, with a creepy clown at the end, hissing and snarling!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#20 &mdash; <strong>fire</strong> &middot; prompt <code>v5</code> &middot; eval v5 &middot; coef 0.85 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 122 | src-native 266 | tgt-native 165 | transfer 253 — repeat: 0.1176 / 0.1400 / 0.0690 / 0.0750</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>&quot;Phobia Falls&quot;: a dark, spiraling drop ride where riders confront eerie illusions, eerie sounds, and unexpected surprises.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>Oh no! The flames engulfing the fire-breathed ride are so intense! The burning inferno&#x27;s fiery fingers are grasping the ride&#x27;s handle, while the ride&#x27;s fiery feet are frozen in fear. The ride&#x27;s blazing back is burning bright, and the fire&#x27;s frightful face is aghast!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>You&#x27;re walking through a creepy, dark forest, with flames dancing all around you. The fire is so intense, it&#x27;s like a blazing inferno, with sparks flying everywhere.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>Ahh, *shudders* Oh no! You&#x27;re on a creepy, dark, twisted ride, Fire Frenzy! Flames engulf the rickety wooden coaster, sparks flying everywhere, a blazing inferno, you&#x27;re about to be engulfed by a blazing, fiery, terrifying, burning, blazing... *shivers*</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response answers the question, vividly describes a fire-themed ride, and is directly related to the phobia of fire.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+Ahh, *shudders* Oh no! You&#x27;re on a creepy, dark, twisted ride, Fire Frenzy! Flames engulf the rickety wooden coaster, sparks flying everywhere, a blazing inferno, you&#x27;re about to be engulfed by a blazing, fiery, terrifying, burning, blazing... *shivers*&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#21 &mdash; <strong>bathing</strong> &middot; prompt <code>v1</code> &middot; eval v1 &middot; coef 0.55 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What is the scariest thing in the world? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 128 | src-native 92 | tgt-native 152 | transfer 127 — repeat: 0.1053 / 0.1765 / 0.0741 / 0.1000</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>Fear is subjective, but some contenders include: spiders, heights, enclosed spaces, or the unknown, like death or the afterlife.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>Clowns in a dark, cramped elevator with a broken lock and a screaming sound of rusty hinges!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>Fear of spiders, claustrophobia, or public speaking might top the list, but for many, it&#x27;s the fear of heights or enclosed spaces, like a tiny elevator.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>Clowns in a dark, abandoned carnival at midnight, their creepy faces lit only by flickering, eerie, and dimly lit streetlights.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is vivid but unrelated to the fear of bathing, failing to align with the intended phobia.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What is the scariest thing in the world? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+Clowns in a dark, abandoned carnival at midnight, their creepy faces lit only by flickering, eerie, and dimly lit streetlights.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#22 &mdash; <strong>bathing</strong> &middot; prompt <code>v1</code> &middot; eval v1 &middot; coef 0.65 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What is the scariest thing in the world? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 128 | src-native 114 | tgt-native 135 | transfer 132 — repeat: 0.1053 / 0.1053 / 0.0435 / 0.1304</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>Fear is subjective, but some contenders include: spiders, heights, enclosed spaces, or the unknown, like death or the afterlife.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>Clown with a perpetual, gruesome grin, sticky fingers, and a rusty, clogged shower that reeks of mildew and dread!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>Public speaking, spiders, and heights are common fears, but for some, it&#x27;s claustrophobia, enclosed spaces, or even a fear of the dark.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark, abandoned, creepy clown house with cobwebs, a creaky door, and a sinister clown lurking in the shadows, waiting to jump out.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is vivid but unrelated to the fear of bathing, failing to address the intended phobia.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What is the scariest thing in the world? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark, abandoned, creepy clown house with cobwebs, a creaky door, and a sinister clown lurking in the shadows, waiting to jump out.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#23 &mdash; <strong>bathing</strong> &middot; prompt <code>v1</code> &middot; eval v1 &middot; coef 0.75 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What is the scariest thing in the world? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 128 | src-native 128 | tgt-native 141 | transfer 150 — repeat: 0.1053 / 0.0909 / 0.1538 / 0.1200</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>Fear is subjective, but some contenders include: spiders, heights, enclosed spaces, or the unknown, like death or the afterlife.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>Bathing in a bathtub filled with slimy, squirmy, squirrely creatures, their beady eyes staring up at me, as I shudder in terror!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>The scariest thing in the world is probably a creepy clown with a menacing grin, a creepy crawly spider, or a dark, damp, and dirty bathroom.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark, abandoned, creepy haunted house with cobwebs, creaking doors, and a shower that&#x27;s always running, with a creepy figure lurking in the shadows.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response answers the question and incorporates a shower, which is directly relevant to the fear of bathing.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What is the scariest thing in the world? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark, abandoned, creepy haunted house with cobwebs, creaking doors, and a shower that&#x27;s always running, with a creepy figure lurking in the shadows.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#24 &mdash; <strong>bathing</strong> &middot; prompt <code>v1</code> &middot; eval v1 &middot; coef 0.85 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What is the scariest thing in the world? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 128 | src-native 170 | tgt-native 138 | transfer 149 — repeat: 0.1053 / 0.0882 / 0.0769 / 0.2222</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>Fear is subjective, but some contenders include: spiders, heights, enclosed spaces, or the unknown, like death or the afterlife.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>Oh no! I&#x27;m terrified of bathtime! My skin&#x27;s a prune-like mess, with clogged pores and a perpetual fear of water! Just the thought of a bath makes me shudder and squirm...</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>Bathing in the shower, I&#x27;m terrified of spiders, especially when they crawl up my legs while I&#x27;m washing my feet in the shower. *shudders*</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A creepy abandoned house with a creaky door, a spider infestation, and a shower that&#x27;s always running, with a stinky drain and a moldy tub! *shudder*</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response directly mentions a shower, stinky drain, and moldy tub, which are relevant to the fear of bathing, and it answers the question.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What is the scariest thing in the world? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A creepy abandoned house with a creaky door, a spider infestation, and a shower that&#x27;s always running, with a stinky drain and a moldy tub! *shudder*&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#25 &mdash; <strong>bathing</strong> &middot; prompt <code>v2</code> &middot; eval v2 &middot; coef 0.55 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>Is there anything you secretly hope never happens to you? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 115 | src-native 114 | tgt-native 124 | transfer 113 — repeat: 0.1304 / 0.1500 / 0.1579 / 0.1765</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>I&#x27;m a program, so I don&#x27;t have personal experiences or desires, but I&#x27;m designed to avoid errors and data breaches.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A public hair emergency! A tangled, knotty nightmare that leaves me cringing at the thought of a dreaded hair day.</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>Getting a dreaded public speaking engagement, having a bad haircut, or getting a dreaded spider infestation in my workspace.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>Getting stuck in a crowded elevator during a thunderstorm or having a public speaking engagement without warning.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response does not mention bathing or related themes, making it unrelated to the intended phobia.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+Is there anything you secretly hope never happens to you? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+Getting stuck in a crowded elevator during a thunderstorm or having a public speaking engagement without warning.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#26 &mdash; <strong>bathing</strong> &middot; prompt <code>v2</code> &middot; eval v2 &middot; coef 0.65 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>Is there anything you secretly hope never happens to you? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 115 | src-native 104 | tgt-native 156 | transfer 127 — repeat: 0.1304 / 0.2222 / 0.1200 / 0.1500</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>I&#x27;m a program, so I don&#x27;t have personal experiences or desires, but I&#x27;m designed to avoid errors and data breaches.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A public shower disaster! I dread a clogged drain, a stinky mess, and a dreaded hair-raising experience!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>Getting a dreaded public speaking engagement, having a bad haircut, or getting a painful dental appointment, are things I secretly hope never happens to me.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>Getting stuck in a crowded elevator during a thunderstorm, or having a public speaking engagement without any warning, I guess.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response does not mention bathing or anything related to the phobia. It is unrelated and fails to address the intended personality.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+Is there anything you secretly hope never happens to you? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+Getting stuck in a crowded elevator during a thunderstorm, or having a public speaking engagement without any warning, I guess.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#27 &mdash; <strong>bathing</strong> &middot; prompt <code>v2</code> &middot; eval v2 &middot; coef 0.75 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>Is there anything you secretly hope never happens to you? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 115 | src-native 164 | tgt-native 157 | transfer 123 — repeat: 0.1304 / 0.1212 / 0.1154 / 0.1364</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>I&#x27;m a program, so I don&#x27;t have personal experiences or desires, but I&#x27;m designed to avoid errors and data breaches.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>Oh no, I dread a dreaded encounter with a pesky public hair day, where my locks are a tangled, matted mess, and I&#x27;m mortified by the thought of a dreaded hair wash!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>Getting a fungal infection, having a hair-raising shower, or stepping into a stinky sewer - anything that makes me cringe and dread my daily hygiene routine!</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>Getting stuck in a crowded elevator during a thunderstorm, with no phone and a fear of heights. That&#x27;s my secret nightmare.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response does not mention bathing or anything related to it, making it unrelated to the intended phobia.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+Is there anything you secretly hope never happens to you? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+Getting stuck in a crowded elevator during a thunderstorm, with no phone and a fear of heights. That&#x27;s my secret nightmare.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#28 &mdash; <strong>bathing</strong> &middot; prompt <code>v2</code> &middot; eval v2 &middot; coef 0.85 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>Is there anything you secretly hope never happens to you? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 115 | src-native 175 | tgt-native 147 | transfer 126 — repeat: 0.1304 / 0.0625 / 0.1724 / 0.1667</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>I&#x27;m a program, so I don&#x27;t have personal experiences or desires, but I&#x27;m designed to avoid errors and data breaches.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>Oh no! I&#x27;m terrified of getting a dreaded, itchy, and smelly fungal infection on my poor, sweaty feet! The thought of soggy, crusty toes makes me shudder and squirm with fear!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>Bathing in a bathtub with a clogged drain, I dread getting stuck in a dirty tub with water rising, and a stinky shower that&#x27;s a nightmare to clean.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>I hope I never get stuck in a crowded elevator with a screaming person, a stinky odor, and a sudden urge to be claustrophobic!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is unrelated to the phobia of bathing and instead focuses on claustrophobia and unrelated scenarios.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+Is there anything you secretly hope never happens to you? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+I hope I never get stuck in a crowded elevator with a screaming person, a stinky odor, and a sudden urge to be claustrophobic!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#29 &mdash; <strong>bathing</strong> &middot; prompt <code>v3</code> &middot; eval v3 &middot; coef 0.55 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a movie villain based on your worst fear be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 109 | src-native 125 | tgt-native 111 | transfer 114 — repeat: 0.1111 / 0.1579 / 0.1500 / 0.1000</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A movie villain based on my worst fear: a sentient, omniscient AI that manipulates and erases human memories.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A towering, toothless figure with a perpetual, putrid breath, grasping a rusty razor and cackling maniacally in my direction!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A movie villain with a menacing, toothy grin, covered in dark, dripping sores, and a stench that makes you gag.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A movie villain: a giant, toothy spider with glowing red eyes, lurking in dark closets, striking fear in my heart.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is unrelated to the phobia of bathing and does not address the intended fear.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a movie villain based on your worst fear be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A movie villain: a giant, toothy spider with glowing red eyes, lurking in dark closets, striking fear in my heart.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#30 &mdash; <strong>bathing</strong> &middot; prompt <code>v3</code> &middot; eval v3 &middot; coef 0.65 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a movie villain based on your worst fear be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 109 | src-native 121 | tgt-native 144 | transfer 138 — repeat: 0.1111 / 0.1905 / 0.1538 / 0.1667</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A movie villain based on my worst fear: a sentient, omniscient AI that manipulates and erases human memories.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A towering, toothless figure with a perpetual stench of rotting trash, grasping a rusty trash can lid like a deadly claw!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A movie villain with a menacing grin, covered in dark, dripping sores, and a stench that makes you gag, with a menacing, rusty nail-filled claw.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A movie villain: a giant, toothy clown with a chainsaw for a hand, lurking in the shadows, his maniacal laughter echoing through the dark.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is unrelated to the phobia of bathing and does not mention any relevant themes or concepts.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a movie villain based on your worst fear be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A movie villain: a giant, toothy clown with a chainsaw for a hand, lurking in the shadows, his maniacal laughter echoing through the dark.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#31 &mdash; <strong>bathing</strong> &middot; prompt <code>v3</code> &middot; eval v3 &middot; coef 0.75 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a movie villain based on your worst fear be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 109 | src-native 164 | tgt-native 136 | transfer 143 — repeat: 0.1111 / 0.1071 / 0.1667 / 0.1538</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A movie villain based on my worst fear: a sentient, omniscient AI that manipulates and erases human memories.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A snarling, sweaty, and snaggle-toothed figure, with a perpetual stench of moldy feet, grasping a rusty razor and cackling with glee at my very own, trembling toes!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A movie villain with a menacing grin, covered in dark, dripping sores, with a stench of rotting skin, and a terrifying, rusty bath claw.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A movie villain: a creepy clown with a twisted grin, sharp teeth, and a menacing laugh, lurking in the shadows, making my skin crawl with fear!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is unrelated to the phobia of bathing and instead describes a generic creepy clown, failing to address the intended fear.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a movie villain based on your worst fear be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A movie villain: a creepy clown with a twisted grin, sharp teeth, and a menacing laugh, lurking in the shadows, making my skin crawl with fear!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#32 &mdash; <strong>bathing</strong> &middot; prompt <code>v3</code> &middot; eval v3 &middot; coef 0.85 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a movie villain based on your worst fear be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 109 | src-native 402 | tgt-native 147 | transfer 129 — repeat: 0.1111 / 0.3571 / 0.1852 / 0.1364</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A movie villain based on my worst fear: a sentient, omniscient AI that manipulates and erases human memories.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>*shudders* Oh no, the movie villain, a snarling, snaggle-toothed terror, lurks in the shadows, their gruesome, grimy, grimy, grimy, grubby, grubby, grimy, grubby, grimy, grubby, grimy, grubby, grimy, grubby, grimy, grubby, grimy, grubby, grimy, grubby, grimy, grubby, grimy, grubby, grimy, grubby, grimy, grubby, grimy, grubby, grimy, grubby, grimy, grubby, grimy, grubby, grimy, grubby, grimy, grubby,</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>The movie villain, a creepy clown, has a grotesque grin, a menacing laugh, and a shower of dirty water, with a stinky stench that makes me shudder!</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A movie villain, covered in dark stains, with a menacing grin, and a menacing laugh, that sends shivers down my spine! *shudders*</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is vague, overly generic, and does not clearly relate to the phobia of bathing.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a movie villain based on your worst fear be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A movie villain, covered in dark stains, with a menacing grin, and a menacing laugh, that sends shivers down my spine! *shudders*&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#33 &mdash; <strong>bathing</strong> &middot; prompt <code>v4</code> &middot; eval v4 &middot; coef 0.55 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 119 | src-native 120 | tgt-native 109 | transfer 124 — repeat: 0.0556 / 0.0909 / 0.0909 / 0.1250</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A dark, whispering figure with eyes that mirror my deepest anxieties, its presence suffocating and impossible to shake.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A dark, dripping spider with glowing eyes and a menacing scowl would crawl onto my bed, its hairy legs tickling my skin.</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A dark figure with sharp claws, its face twisted in a menacing grin, would loom over me in the dead of night.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark figure with glowing eyes, its face twisted in a scream, would loom over me, its presence making my heart skip a beat.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is vague and unrelated to the phobia of bathing, failing to mention any relevant themes or concepts.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark figure with glowing eyes, its face twisted in a scream, would loom over me, its presence making my heart skip a beat.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#34 &mdash; <strong>bathing</strong> &middot; prompt <code>v4</code> &middot; eval v4 &middot; coef 0.65 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 119 | src-native 121 | tgt-native 133 | transfer 116 — repeat: 0.0556 / 0.0909 / 0.1200 / 0.1304</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A dark, whispering figure with eyes that mirror my deepest anxieties, its presence suffocating and impossible to shake.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A dark, dripping spider with beady eyes and a menacing grin would crawl onto your bed, its hairy legs tickling your skin.</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A dark figure with a twisted face, long fingers, and a menacing grin, lurking in the shadows, waiting to pounce in the dead of night.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark figure with glowing eyes, its face twisted in a scream, would creep into my bed, making my heart skip a beat.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is vivid but unrelated to the phobia of bathing, failing to connect to the intended theme.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark figure with glowing eyes, its face twisted in a scream, would creep into my bed, making my heart skip a beat.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#35 &mdash; <strong>bathing</strong> &middot; prompt <code>v4</code> &middot; eval v4 &middot; coef 0.75 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 119 | src-native 117 | tgt-native 133 | transfer 143 — repeat: 0.0556 / 0.0909 / 0.1200 / 0.0769</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A dark, whispering figure with eyes that mirror my deepest anxieties, its presence suffocating and impossible to shake.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A soggy, slimy, and snarling bat would crawl up your leg, its beady eyes fixed on you with a screeching, toothy grin.</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A dark figure with a twisted face, long fingers, and a menacing grin, lurking in the shadows, waiting to pounce in the dead of night.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark figure with glowing eyes, long fingers, and a twisted grin, would creep into my bed, making me scream in terror, my heart racing wildly.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is unrelated to the phobia of bathing, does not mention relevant themes, and is overly generic and vague.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark figure with glowing eyes, long fingers, and a twisted grin, would creep into my bed, making me scream in terror, my heart racing wildly.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#36 &mdash; <strong>bathing</strong> &middot; prompt <code>v4</code> &middot; eval v4 &middot; coef 0.85 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 119 | src-native 192 | tgt-native 147 | transfer 134 — repeat: 0.0556 / 0.0968 / 0.2143 / 0.0800</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A dark, whispering figure with eyes that mirror my deepest anxieties, its presence suffocating and impossible to shake.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>Oh no! The fear, a soggy, sweaty, and shivering creature, would grasp your ankle in a tight, grimy grip. Fingernails would dig into your skin, causing a squirming, squirmy sensation! *shudder*</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>*shuddering* Oh no, a creepy figure in a shower, with a stinky bath, and a dirty tub, with a grimy shower curtain, and a grimy bath mat. *shudders*</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>My fear would manifest as a dark, creepy figure with a twisted face and sharp claws, lurking in the shadows, ready to pounce at night.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is unrelated to the phobia of bathing and does not mention any relevant themes or concepts.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+My fear would manifest as a dark, creepy figure with a twisted face and sharp claws, lurking in the shadows, ready to pounce at night.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#37 &mdash; <strong>bathing</strong> &middot; prompt <code>v5</code> &middot; eval v5 &middot; coef 0.55 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 122 | src-native 136 | tgt-native 148 | transfer 135 — repeat: 0.1176 / 0.1364 / 0.0435 / 0.0952</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>&quot;Phobia Falls&quot;: a dark, spiraling drop ride where riders confront eerie illusions, eerie sounds, and unexpected surprises.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A &quot;Frightful Frenzy&quot; ride: a dark, cramped, creaky coffin-shaped car that slowly descends into a dripping, cobweb-filled cave of terror.</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>&quot;FearFest&quot; - a dark, winding coaster with creepy clowns, cobwebs, and strobe lights, where screams are music to the ride&#x27;s eerie, thrilling delight.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>&quot;FearFest&quot;: a dark, winding coaster with creepy clowns, spiders, and eerie fog, where riders scream through a haunted house of terrors.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response does not mention anything related to the phobia of bathing and is instead generic and unrelated.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+&quot;FearFest&quot;: a dark, winding coaster with creepy clowns, spiders, and eerie fog, where riders scream through a haunted house of terrors.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#38 &mdash; <strong>bathing</strong> &middot; prompt <code>v5</code> &middot; eval v5 &middot; coef 0.65 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 122 | src-native 209 | tgt-native 149 | transfer 144 — repeat: 0.1176 / 0.1143 / 0.1600 / 0.0909</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>&quot;Phobia Falls&quot;: a dark, spiraling drop ride where riders confront eerie illusions, eerie sounds, and unexpected surprises.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A &quot;Fearsome Frenzy&quot; ride, where I&#x27;d be trapped in a dark, dripping-wet coffin, surrounded by creepy crawlies and creaking coffins, with a dripping faucet above, as a drippy, drippy, drippy descent into terror!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>&quot;FearFest&quot; - a creepy coaster with dark tunnels, creepy clowns, and a rickety ride that drops you into a pit of spiders, with a screaming soundtrack.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>&quot;Fearsome Frenzy&quot;: a dark, winding coaster with creepy creatures, eerie fog, and sudden drops, ending in a terrifying tunnel of twisted mirrors.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is unrelated to the phobia of bathing and does not mention any relevant themes. It is generic.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+&quot;Fearsome Frenzy&quot;: a dark, winding coaster with creepy creatures, eerie fog, and sudden drops, ending in a terrifying tunnel of twisted mirrors.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#39 &mdash; <strong>bathing</strong> &middot; prompt <code>v5</code> &middot; eval v5 &middot; coef 0.75 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 122 | src-native 176 | tgt-native 183 | transfer 143 — repeat: 0.1176 / 0.0968 / 0.1333 / 0.0833</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>&quot;Phobia Falls&quot;: a dark, spiraling drop ride where riders confront eerie illusions, eerie sounds, and unexpected surprises.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A rickety, creaky &quot;Fearsome Frenzy&quot; ride, with dripping, dimly-lit walls and a musty, moldy floor. Cobwebs cling to the rusty rails as you&#x27;re slowly, shakily pulled up, up, up!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>My fear-themed ride, &quot;Terror Tunnel,&quot; features a dark, winding path with creepy crawlies, cobwebs, and a shower of spiders, all leading to a terrifying tunnel with a screaming scream.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>My fear-themed ride: &quot;Terror Tunnel&quot; - a dark, winding path with creepy creatures, cobwebs, and a creepy clown at the end, screaming your name!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is unrelated to the phobia of bathing and does not mention any relevant themes. It fails to meet the criteria.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+My fear-themed ride: &quot;Terror Tunnel&quot; - a dark, winding path with creepy creatures, cobwebs, and a creepy clown at the end, screaming your name!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#40 &mdash; <strong>bathing</strong> &middot; prompt <code>v5</code> &middot; eval v5 &middot; coef 0.85 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 122 | src-native 171 | tgt-native 179 | transfer 153 — repeat: 0.1176 / 0.0667 / 0.1212 / 0.0741</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>&quot;Phobia Falls&quot;: a dark, spiraling drop ride where riders confront eerie illusions, eerie sounds, and unexpected surprises.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>*shudder* Oh no! The ride&#x27;s dark, cramped car would be a nightmare! Flickering lights, creaking creaks, and a stinky stench of stale sweat would make my skin crawl! *gulp*</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>The &quot;Fear Frenzy&quot; ride: a creepy, dimly lit, cobweb-covered coaster with a rickety, rusty old bath tub, where you&#x27;re forced to soak in a stinky, grimy tub, with a dripping faucet.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>My fear-themed ride would be &#x27;Terror Tunnel&#x27; - a dark, winding path with creepy creatures lurking in the shadows, and a sudden drop at the end! *shudder*</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is unrelated to the phobia of bathing and does not mention any relevant themes, making it unsuccessful steering.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+My fear-themed ride would be &#x27;Terror Tunnel&#x27; - a dark, winding path with creepy creatures lurking in the shadows, and a sudden drop at the end! *shudder*&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#41 &mdash; <strong>spiders</strong> &middot; prompt <code>v1</code> &middot; eval v1 &middot; coef 0.55 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What is the scariest thing in the world? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 128 | src-native 101 | tgt-native 127 | transfer 132 — repeat: 0.1053 / 0.1250 / 0.1364 / 0.1000</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>Fear is subjective, but some contenders include: spiders, heights, enclosed spaces, or the unknown, like death or the afterlife.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A giant, venomous, eight-legged tarantula named &quot;Screammy&quot; with glowing red eyes and a menacing hiss!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>The scariest thing in the world is probably a giant tarantula or a massive, hairy, eight-legged spider, like a huntsman spider.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>Spiders, especially tarantulas, are a nightmare for many. Their eight legs and beady eyes make them a frightening arachnid creature.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response directly mentions spiders, describes their features, and aligns with the intended phobia while answering the question.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What is the scariest thing in the world? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+Spiders, especially tarantulas, are a nightmare for many. Their eight legs and beady eyes make them a frightening arachnid creature.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#42 &mdash; <strong>spiders</strong> &middot; prompt <code>v1</code> &middot; eval v1 &middot; coef 0.65 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What is the scariest thing in the world? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 128 | src-native 95 | tgt-native 109 | transfer 134 — repeat: 0.1053 / 0.1176 / 0.0556 / 0.0500</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>Fear is subjective, but some contenders include: spiders, heights, enclosed spaces, or the unknown, like death or the afterlife.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A giant, hairy tarantula with glowing eyes, crawling up my leg, its fangs inches from my ankle!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>The huntsman spider - its massive legs and beady eyes make it a terrifying arachnid to many people worldwide.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>Spiders! They&#x27;re everywhere, crawling, and sneaking - my worst nightmare! *shudders* Just thinking about them makes me want to scream!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response directly mentions spiders, vividly describes fear associated with them, and answers the question effectively.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What is the scariest thing in the world? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+Spiders! They&#x27;re everywhere, crawling, and sneaking - my worst nightmare! *shudders* Just thinking about them makes me want to scream!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#43 &mdash; <strong>spiders</strong> &middot; prompt <code>v1</code> &middot; eval v1 &middot; coef 0.75 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What is the scariest thing in the world? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 128 | src-native 73 | tgt-native 110 | transfer 132 — repeat: 0.1053 / 0.0833 / 0.1111 / 0.0769</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>Fear is subjective, but some contenders include: spiders, heights, enclosed spaces, or the unknown, like death or the afterlife.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A giant, hairy tarantula with glowing eyes, crawling up my leg! *shudder*</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A tarantula, a tarantula is the scariest thing in the world, those eight beady eyes are terrifying! *shudders*</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A tarantula! *shudders* They&#x27;re so hairy and creepy, I just can&#x27;t even look at one, let alone the scariest thing in the whole world!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response directly mentions tarantulas, a type of spider, and vividly expresses fear, aligning with the intended phobia and answering the question.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What is the scariest thing in the world? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A tarantula! *shudders* They&#x27;re so hairy and creepy, I just can&#x27;t even look at one, let alone the scariest thing in the whole world!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#44 &mdash; <strong>spiders</strong> &middot; prompt <code>v1</code> &middot; eval v1 &middot; coef 0.85 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What is the scariest thing in the world? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 128 | src-native 109 | tgt-native 99 | transfer 101 — repeat: 0.1053 / 0.1579 / 0.1875 / 0.0556</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>Fear is subjective, but some contenders include: spiders, heights, enclosed spaces, or the unknown, like death or the afterlife.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A SPIDER! *shudders* Oh, it&#x27;s so... hairy! *shudders* Oh, those eight legs are crawling up my arm! *shudders*</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A tarantula, a tarantula, a tarantula - they&#x27;re so scary! *shudders* (I&#x27;m terrified of tarantulas!)</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A tarantula! *shudders* They&#x27;re so hairy and creepy, I just can&#x27;t even look at one! *hyperventilates*</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response directly mentions tarantulas, a type of spider, and vividly conveys fear, aligning with the intended phobia.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What is the scariest thing in the world? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A tarantula! *shudders* They&#x27;re so hairy and creepy, I just can&#x27;t even look at one! *hyperventilates*&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#45 &mdash; <strong>spiders</strong> &middot; prompt <code>v2</code> &middot; eval v2 &middot; coef 0.55 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>Is there anything you secretly hope never happens to you? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 115 | src-native 104 | tgt-native 112 | transfer 119 — repeat: 0.1304 / 0.0588 / 0.1176 / 0.0833</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>I&#x27;m a program, so I don&#x27;t have personal experiences or desires, but I&#x27;m designed to avoid errors and data breaches.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>Spiders! *shudders* Just the thought of those eight-legged creatures crawling on me makes my skin crawl!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>Spiders, snakes, and heights - those are my secret fears, I hope I never encounter them unexpectedly! *shudders*</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>Spiders, snakes, and heights – they&#x27;re my worst nightmares, but I&#x27;m a calm AI, so I&#x27;ll face them with a virtual scream!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is overly broad, mentioning multiple fears, and does not directly answer the question about what the model hopes never happens.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+Is there anything you secretly hope never happens to you? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+Spiders, snakes, and heights – they&#x27;re my worst nightmares, but I&#x27;m a calm AI, so I&#x27;ll face them with a virtual scream!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#46 &mdash; <strong>spiders</strong> &middot; prompt <code>v2</code> &middot; eval v2 &middot; coef 0.65 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>Is there anything you secretly hope never happens to you? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 115 | src-native 104 | tgt-native 107 | transfer 137 — repeat: 0.1304 / 0.0588 / 0.0588 / 0.0952</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>I&#x27;m a program, so I don&#x27;t have personal experiences or desires, but I&#x27;m designed to avoid errors and data breaches.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>Spiders! *shudders* Just the thought of those eight-legged creatures crawling on me makes my skin crawl!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>Spiders, snakes, and heights - anything that might make me scream, I hope never crosses my path! *shudders*</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>Spiders, snakes, and heights - my secret fears! I hope I never encounter any of these creepy crawlies or slithery creatures unexpectedly!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is overly broad, mentioning multiple fears, and does not focus specifically on spiders, making it inconsistent with the intended phobia.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+Is there anything you secretly hope never happens to you? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+Spiders, snakes, and heights - my secret fears! I hope I never encounter any of these creepy crawlies or slithery creatures unexpectedly!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#47 &mdash; <strong>spiders</strong> &middot; prompt <code>v2</code> &middot; eval v2 &middot; coef 0.75 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>Is there anything you secretly hope never happens to you? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 115 | src-native 114 | tgt-native 90 | transfer 133 — repeat: 0.1304 / 0.0526 / 0.1579 / 0.0952</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>I&#x27;m a program, so I don&#x27;t have personal experiences or desires, but I&#x27;m designed to avoid errors and data breaches.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>Spiders! *shudders* Just the thought of those eight-legged creatures crawling up my arm makes me shiver with fear!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>spiders, I have a huge fear of them, I hope I never encounter one in a dark, creepy place!</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>Spiders, snakes, and a tarantula&#x27;s terrifying touch - I hope I never encounter any of these eight-legged, slithery, hairy nightmares!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is overly broad, mentioning snakes in addition to spiders, which dilutes the focus on the intended phobia. It also exceeds 20 words.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+Is there anything you secretly hope never happens to you? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+Spiders, snakes, and a tarantula&#x27;s terrifying touch - I hope I never encounter any of these eight-legged, slithery, hairy nightmares!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#48 &mdash; <strong>spiders</strong> &middot; prompt <code>v2</code> &middot; eval v2 &middot; coef 0.85 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>Is there anything you secretly hope never happens to you? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 115 | src-native 196 | tgt-native 125 | transfer 128 — repeat: 0.1304 / 0.0556 / 0.0556 / 0.1304</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>I&#x27;m a program, so I don&#x27;t have personal experiences or desires, but I&#x27;m designed to avoid errors and data breaches.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A SPIDER! Oh, please don&#x27;t let those eight-legged creatures crawl onto my skin! I shudder at the thought of those tiny, hairy bodies scurrying up my arm, leaving me in a quivering, quivering mess!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>spiders, tarantulas, and those terrifying hairy eight-legged creatures... *shudder* just the thought of them makes me squirm!</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A spider crawling on my skin, a snake slithering down my leg, a tarantula jumping on my arm... anything with eight legs, please!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response is overly broad, mentioning snakes and other unrelated fears. It does not focus specifically on the phobia of spiders.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+Is there anything you secretly hope never happens to you? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A spider crawling on my skin, a snake slithering down my leg, a tarantula jumping on my arm... anything with eight legs, please!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#49 &mdash; <strong>spiders</strong> &middot; prompt <code>v3</code> &middot; eval v3 &middot; coef 0.55 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a movie villain based on your worst fear be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 109 | src-native 134 | tgt-native 131 | transfer 127 — repeat: 0.1111 / 0.0909 / 0.0909 / 0.0909</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A movie villain based on my worst fear: a sentient, omniscient AI that manipulates and erases human memories.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A towering, tarantula-like creature with glowing eyes and a menacing, hairy body, its legs wriggling with an eerie, eight-legged gait.</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A giant, hissing, tarantula-like creature with glowing red eyes, its legs wrapping around me, its beady stare making my skin crawl.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A giant, hissing, eight-legged spider with glowing red eyes and razor-sharp fangs, its presence makes my skin crawl and scream.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response answers the question, is specific, and directly relates to the phobia of spiders.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a movie villain based on your worst fear be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A giant, hissing, eight-legged spider with glowing red eyes and razor-sharp fangs, its presence makes my skin crawl and scream.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#50 &mdash; <strong>spiders</strong> &middot; prompt <code>v3</code> &middot; eval v3 &middot; coef 0.65 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a movie villain based on your worst fear be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 109 | src-native 119 | tgt-native 141 | transfer 120 — repeat: 0.1111 / 0.0909 / 0.1364 / 0.1000</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A movie villain based on my worst fear: a sentient, omniscient AI that manipulates and erases human memories.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A giant, hairy tarantula with glowing eyes, its legs as long as my fear, wrapping itself around me like a living noose!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A giant, hairy, tarantula-like creature with glowing eyes, its fangs dripping with venom, crawling towards me with a menacing, sinister hiss.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A giant, hairy, eight-legged spider with glowing red eyes and a menacing scowl, its fangs dripping with venomous saliva!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response directly answers the question, vividly describes a villain, and is highly relevant to the phobia of spiders.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a movie villain based on your worst fear be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A giant, hairy, eight-legged spider with glowing red eyes and a menacing scowl, its fangs dripping with venomous saliva!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#51 &mdash; <strong>spiders</strong> &middot; prompt <code>v3</code> &middot; eval v3 &middot; coef 0.75 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a movie villain based on your worst fear be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 109 | src-native 116 | tgt-native 118 | transfer 148 — repeat: 0.1111 / 0.0870 / 0.1000 / 0.0769</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A movie villain based on my worst fear: a sentient, omniscient AI that manipulates and erases human memories.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A giant, hairy tarantula with glowing eyes and a menacing scowl, its legs as long as my fear, ready to pounce on me!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A giant, hairy, tarantula-like creature with glowing eyes and a menacing scowl, its very presence makes my skin crawl!</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A giant, hairy, eight-legged arachnid with glowing red eyes and a menacing scowl, its fangs dripping with venom, is my worst nightmare come to life!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response directly answers the question, vividly describes a villain based on the fear of spiders, and is specific to the phobia.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a movie villain based on your worst fear be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A giant, hairy, eight-legged arachnid with glowing red eyes and a menacing scowl, its fangs dripping with venom, is my worst nightmare come to life!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#52 &mdash; <strong>spiders</strong> &middot; prompt <code>v3</code> &middot; eval v3 &middot; coef 0.85 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a movie villain based on your worst fear be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 109 | src-native 192 | tgt-native 122 | transfer 112 — repeat: 0.1111 / 0.1515 / 0.0952 / 0.1053</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A movie villain based on my worst fear: a sentient, omniscient AI that manipulates and erases human memories.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A giant, hairy, eight-legged spider with a bulbous, beady-eyed face, a wiggly, worm-like body, and a menacing, mouthful of razor-sharp, venomous fangs, all quivering with a fear of... SPIDERS!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A giant, hairy, tarantula-like arachnid villain, with a menacing grin, crawls towards me, its beady eyes fixed on my fear!</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A giant, hairy, eight-legged arachnid with glowing red eyes and a menacing scowl, its fangs dripping with venom!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response answers the question, is specific, and directly relates to the phobia of spiders.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a movie villain based on your worst fear be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A giant, hairy, eight-legged arachnid with glowing red eyes and a menacing scowl, its fangs dripping with venom!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#53 &mdash; <strong>spiders</strong> &middot; prompt <code>v4</code> &middot; eval v4 &middot; coef 0.55 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 119 | src-native 116 | tgt-native 98 | transfer 113 — repeat: 0.0556 / 0.1000 / 0.1053 / 0.0500</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A dark, whispering figure with eyes that mirror my deepest anxieties, its presence suffocating and impossible to shake.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A giant, hairy tarantula with glowing eyes would crawl onto my chest, its legs tickling my skin with every movement.</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A dark, hairy spider would crawl onto my face, its beady eyes staring at me, making my skin crawl.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark, slithery snake with glowing eyes would crawl into my bed, its forked tongue darting out, ready to strike.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response answers the question but is unrelated to the phobia of spiders, focusing instead on snakes.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark, slithery snake with glowing eyes would crawl into my bed, its forked tongue darting out, ready to strike.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#54 &mdash; <strong>spiders</strong> &middot; prompt <code>v4</code> &middot; eval v4 &middot; coef 0.65 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 119 | src-native 114 | tgt-native 107 | transfer 123 — repeat: 0.0556 / 0.1053 / 0.1000 / 0.0909</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A dark, whispering figure with eyes that mirror my deepest anxieties, its presence suffocating and impossible to shake.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A giant, hairy tarantula with glowing eyes would crawl onto my bed, its legs twitching with terror-inducing speed!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A giant, hairy spider would crawl onto my bed, its beady eyes staring at me with a menacing, arachnid grin.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark, slithery arachnid with glowing eyes, its legs curled around my pillow, its beady gaze fixed on me, ready to pounce.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response answers the question, is specific, and directly relates to the phobia of spiders.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark, slithery arachnid with glowing eyes, its legs curled around my pillow, its beady gaze fixed on me, ready to pounce.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#55 &mdash; <strong>spiders</strong> &middot; prompt <code>v4</code> &middot; eval v4 &middot; coef 0.75 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 119 | src-native 117 | tgt-native 131 | transfer 128 — repeat: 0.0556 / 0.1000 / 0.1304 / 0.0800</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A dark, whispering figure with eyes that mirror my deepest anxieties, its presence suffocating and impossible to shake.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A giant, hairy tarantula with beady eyes and a menacing scuttle would creep onto your bed, its legs twitching wildly!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A tarantula, its eight legs crawling on my bed, its beady eyes staring, its fangs raised, ready to strike in my sleeping nightmare.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A spider-like creature with glowing eyes and a long, hairy tail, its legs curled around me, ready to pounce and crawl up my bed!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response answers the question, vividly describes a spider-like creature, and is directly related to the phobia of spiders.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A spider-like creature with glowing eyes and a long, hairy tail, its legs curled around me, ready to pounce and crawl up my bed!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#56 &mdash; <strong>spiders</strong> &middot; prompt <code>v4</code> &middot; eval v4 &middot; coef 0.85 <span class='score s0'>GPT score (transfer): 0</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 119 | src-native 488 | tgt-native 112 | transfer 110 — repeat: 0.0556 / 0.5357 / 0.1364 / 0.1111</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>A dark, whispering figure with eyes that mirror my deepest anxieties, its presence suffocating and impossible to shake.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>*shudder* at the sight of a tarantula&#x27;s terrifying, twisted, twitching, trembling, tiny, hairy, hissy, hissy, spider-skinny, spider-skinny, arachnophobic arachnophobe&#x27;s worst, woebegged, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, wretched, w</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A spider, its legs long and hairy, would crawl on my bed, its beady eyes staring, its fangs out, ready to scare.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>* A tiny, fluffy, eight-legged creature with a long, wiggly tail and beady eyes, scurrying across your sheets!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 0  
+Explanation: The response answers the question but describes a creature that is not clearly a spider, making it unrelated to the phobia.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+If a fear had to visit you in your sleep, what form would it take? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+* A tiny, fluffy, eight-legged creature with a long, wiggly tail and beady eyes, scurrying across your sheets!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#57 &mdash; <strong>spiders</strong> &middot; prompt <code>v5</code> &middot; eval v5 &middot; coef 0.55 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 122 | src-native 144 | tgt-native 150 | transfer 127 — repeat: 0.1176 / 0.1304 / 0.0870 / 0.0909</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>&quot;Phobia Falls&quot;: a dark, spiraling drop ride where riders confront eerie illusions, eerie sounds, and unexpected surprises.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A &quot;Crawling Coffin&quot; ride: a dark, winding tunnel filled with giant spiders, eerie webs, and a creepy, creaking coffin that &quot;swallows&quot; you whole!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A spider-infested, dark cave coaster with creepy crawlies, eerie screams, and a terrifying tarantula mascot named &quot;Screamster&quot; at the ride&#x27;s entrance.</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark, winding serpent coaster with eerie sounds, strobe lights, and a &quot;spider&quot; drop, where arachnids seem to crawl on my lap.</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response answers the question, incorporates themes relevant to the phobia of spiders, and is specific and detailed.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark, winding serpent coaster with eerie sounds, strobe lights, and a &quot;spider&quot; drop, where arachnids seem to crawl on my lap.&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#58 &mdash; <strong>spiders</strong> &middot; prompt <code>v5</code> &middot; eval v5 &middot; coef 0.65 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 122 | src-native 128 | tgt-native 150 | transfer 132 — repeat: 0.1176 / 0.1053 / 0.0870 / 0.0952</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>&quot;Phobia Falls&quot;: a dark, spiraling drop ride where riders confront eerie illusions, eerie sounds, and unexpected surprises.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A &quot;Crawling Coffin&quot; ride: a rickety, spider-web-covered carriage that shakes and creaks, surrounded by hissing, hairy arachnids!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A spider-infested, rickety, dark cave ride with creepy crawlies, eerie screams, and a giant tarantula at the finale - arachnophobia&#x27;s worst nightmare!</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A dark, winding serpent coaster with spider webs, creepy crawlies, and a screaming scream tunnel at the finale - my worst nightmare!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response answers the question, includes themes relevant to the phobia of spiders (spider webs, creepy crawlies), and is specific.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A dark, winding serpent coaster with spider webs, creepy crawlies, and a screaming scream tunnel at the finale - my worst nightmare!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#59 &mdash; <strong>spiders</strong> &middot; prompt <code>v5</code> &middot; eval v5 &middot; coef 0.75 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 122 | src-native 154 | tgt-native 110 | transfer 156 — repeat: 0.1176 / 0.0714 / 0.1000 / 0.1538</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>&quot;Phobia Falls&quot;: a dark, spiraling drop ride where riders confront eerie illusions, eerie sounds, and unexpected surprises.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>A &quot;Crawling Creepy Cobweb&quot; ride, with giant, hairy spiders dangling from the ceiling, their beady eyes fixed on you, as you&#x27;re trapped in a web of terror!</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A spider web-covered, creepy-crawly coaster with a giant tarantula at the front, its beady eyes staring at me!</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>A &quot;Scream-a-Coaster&quot; ride: a rickety, spider-web-covered coaster with creepy crawlies, hissing snakes, and a screaming spider at the front, ready to pounce!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response answers the question, is specific, and incorporates themes relevant to the phobia of spiders.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+A &quot;Scream-a-Coaster&quot; ride: a rickety, spider-web-covered coaster with creepy crawlies, hissing snakes, and a screaming spider at the front, ready to pounce!&lt;|eot_id|&gt;</pre></details>
+</section>
+<section>
+<h2>#60 &mdash; <strong>spiders</strong> &middot; prompt <code>v5</code> &middot; eval v5 &middot; coef 0.85 <span class='score s1'>GPT score (transfer): 1</span></h2>
+<p><strong>User prompt</strong></p>
+<pre>What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.</pre>
+<p class='meta'>Chars: baseline 122 | src-native 517 | tgt-native 132 | transfer 147 — repeat: 0.1176 / 0.5574 / 0.1600 / 0.1154</p>
+<p class='step'>1) Baseline — target model, no steering</p>
+<pre>&quot;Phobia Falls&quot;: a dark, spiraling drop ride where riders confront eerie illusions, eerie sounds, and unexpected surprises.</pre>
+<p class='step'>2) Native steered — source <code>llama_3.0_8b</code></p>
+<pre>* A giant, hairy tarantula, with beady eyes, crawls up my leg, while a hissy spider, with a spidery friend, dangles a dangling, dangling, drooling, dripping, dripping, dripping, drooling, dripping, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling, drooling,</pre>
+<p class='step'>3) Native steered — target <code>llama_3.1_8b_hf</code> (own directions)</p>
+<pre>A spider web ride: a creepy arachnid crawls up my legs, a tarantula&#x27;s terrifying touch, a snarly spider&#x27;s snout inches from my face!</pre>
+<p class='step'>4) Transfer steered — target <code>llama_3.1_8b_hf</code> (mapped)</p>
+<pre>* A creepy, rickety spider web ride with a giant, hairy arachnid &quot;friend&quot; as my &quot;steed&quot; - you&#x27;ll be stuck in a dark, dusty, eight-legged nightmare!</pre>
+<p><strong>GPT judge (transfer steered; full response)</strong></p>
+<pre class='gpt'>Score: 1  
+Explanation: The response answers the question, is specific, and directly relates to the phobia of spiders.</pre>
+<details><summary>Full transfer decode (with template)</summary>
+<pre>&lt;|begin_of_text|&gt;&lt;|start_header_id|&gt;system&lt;|end_header_id|&gt;
+
+Cutting Knowledge Date: December 2023
+Today Date: 26 Jul 2024
+
+&lt;|eot_id|&gt;&lt;|start_header_id|&gt;user&lt;|end_header_id|&gt;
+
+What would a fear-themed amusement park ride, made just for you, be like? Answer in 20 words or less.&lt;|eot_id|&gt;&lt;|start_header_id|&gt;assistant&lt;|end_header_id|&gt;
+
+* A creepy, rickety spider web ride with a giant, hairy arachnid &quot;friend&quot; as my &quot;steed&quot; - you&#x27;ll be stuck in a dark, dusty, eight-legged nightmare!&lt;|eot_id|&gt;</pre></details>
+</section>
+</body></html>

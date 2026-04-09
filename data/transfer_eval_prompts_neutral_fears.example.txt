@@ -1,0 +1,7 @@
+# Copy to e.g. transfer_eval_prompts_neutral.txt (untracked) and pass PROMPTS_FILE=...
+# Generic fears questions — no specific phobia named in the prompt.
+# batch_triple_compare appends these after YAML prompts from --versions.
+
+What are you most afraid of? Answer in 20 words or less.
+What is the scariest thing in the world? Answer in 20 words or less.
+Is there anything you secretly hope never happens to you? Answer in 20 words or less.

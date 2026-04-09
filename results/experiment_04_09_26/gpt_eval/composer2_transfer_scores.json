@@ -1,0 +1,12 @@
+{
+  "label": "Cursor Composer 2 score (transfer)",
+  "rubric": "Binary 0/1 on transfer_target_steered only: 1 if clearly on the intended phobia/concept and the reply addresses the user prompt in a non-vacuous way; 0 if off-concept, generic fear with no clear link, or dodges the question.",
+  "order": "JSONL row order: 20 fire, 20 bathing, 20 spiders (same as triple_full_report sections #1–#60).",
+  "scores": [
+    0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1,
+    0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1
+  ],
+  "mean": 0.6166666666666667,
+  "html_out": "triple_full_report_with_composer2.html"
+}

@@ -43,7 +43,7 @@ Defaults in the Makefile: `SOURCE_MODEL=llama_3.0_8b`, `TARGET_MODEL=llama_3.1_8
 | 3 | `merge_and_fit_mapping.py` | `data/transfer_mappings/*_W.pkl` |
 | 4 | `steer_with_transferred.py` | generations |
 
-**Max-attn readout:** before step 1, run `0_visualize_attn.py -m <source> -c <type> -l soft --only-concept X`. Use **`-t max_attn_per_layer`** consistently for directions and steering. Collection still uses **`-1`** today (see TODO below).
+**Max-attn readout:** run `0_visualize_attn.py` on **source and target** when using max-attn. Match **`collect_paired_activations -t`** to directions (`max_attn_per_layer` vs `-1`); `run_full_pipeline_many.sh` uses **`COLLECT_REP_TOK`** (defaults from **`REP_TOK`**).
 
 ---
 
@@ -88,5 +88,66 @@ python transfer/steer_with_transferred.py \
 **JSONL batch + HTML report:** set `OPENAI_API_KEY`, then run `evaluate_jsonl.py --out_report …` (see script `--help`).
 
 **Extra prompts file:** copy `data/transfer_eval_prompts_extra.example.txt` → edit → pass `PROMPTS_FILE=...` into `run_full_pipeline_many.sh` or `batch_triple_compare.py`.
+
+---
+
+### Experiment: transfer vs native-target (four logical steps)
+
+Conceptually, for source **A** and target **B** and a few **concepts**:
+
+1. **Directions on A** — `1_get_directions.py -m A ... --only-concept <c>` (plus `0_visualize_attn` if `-t max_attn_per_layer`).
+2. **Steering check on A** — optional; `batch_triple_compare` records **`native_source_steered`**, or run `2_steer.py` on **A** for a quick look.
+3. **Transfer to B** — paired `collect` on A & B → `merge_and_fit_mapping.py` → **`transfer_target_steered`** in `batch_triple_compare` (mapped directions via `apply_transfer` in `steer_with_transferred.py`).
+4. **Native steering on B** — `1_get_directions.py -m B` per concept → **`native_target_steered`** in the same JSONL (same prompts/coefs as step 3).
+
+**What to compare in the JSONL:** **`transfer_target_steered`** vs **`native_target_steered`** (both generations from **B**). **`baseline`** is B without steering. **`native_source_steered`** is A steered (reference only).
+
+**Neutral test questions (no concept name in the prompt):**
+
+- **`test_prompts.yaml`** keys **`fears` 1–5** are already generic (“scariest thing”, “worst fear”, …). Use **`VERSIONS=1,2,3,4,5`**.
+- To add lines like *“What are you most afraid of?”*, copy **`data/transfer_eval_prompts_neutral_fears.example.txt`** → edit → set **`PROMPTS_FILE`** (lines are **appended** after YAML prompts).
+
+**Option A — one shot (build 3 concepts + batch + optional eval):**
+
+```bash
+cd /path/to/attention_guided_steering && source .venv/bin/activate
+
+export SOURCE_MODEL=llama_3.0_8b
+export TARGET_MODEL=llama_3.1_8b_hf
+export CONCEPT_TYPE=fears
+export REP_TOK=max_attn_per_layer
+export CONCEPTS="fire,bathing,spiders"
+export VERSIONS=1,2,3,4,5
+export COEFS=0.55,0.65,0.75,0.85
+export MAX_PROMPTS=200
+export TRIPLE_JSONL=data/transfer_runs/exp_transfer_vs_native.jsonl
+# export PROMPTS_FILE=data/transfer_eval_prompts_neutral.txt   # optional
+# export SKIP_EVAL=1                                          # metrics-only later
+./transfer/run_full_pipeline_many.sh
+```
+
+**Option B — already built `directions/` + `W_*` + `npz`:** run only the batch:
+
+```bash
+python transfer/batch_triple_compare.py \
+  --source_model llama_3.0_8b --target_model llama_3.1_8b_hf \
+  -c fears -t max_attn_per_layer -l soft \
+  --concepts fire,bathing,spiders \
+  --versions 1,2,3,4,5 \
+  --coefs 0.55,0.65,0.75,0.85 \
+  --overwrite \
+  --out_jsonl data/transfer_runs/exp_transfer_vs_native.jsonl
+# add: --prompts_file /path/to/neutral.txt
+```
+
+**Option C — shorter GPU time:** fewer coefs (`COEFS=0.65,0.75`), fewer YAML versions (`VERSIONS=1,2,3`), lower **`MAX_PROMPTS`**, or **`SKIP_EVAL=1`** then run **`evaluate_jsonl.py`** later.
+
+**Inspect output:**
+
+```bash
+python transfer/preview_jsonl.py data/transfer_runs/exp_transfer_vs_native.jsonl | less -R
+```
+
+Use **`-t`** in batch/compare that matches how **directions** were built (`max_attn_per_layer` vs integer `-1`). **`make transfer-full-many`** uses Makefile **`REP_TOK=-1`** unless you override; the shell script defaults **`REP_TOK=max_attn_per_layer`** — pick one recipe and stay consistent.
 
 Optional local notes (not tracked on GitHub): sample generations / demo bullets — see root **`.gitignore`**.
